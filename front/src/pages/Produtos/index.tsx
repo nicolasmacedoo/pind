@@ -1,6 +1,6 @@
 import { Header } from "../../components/Header";
 import { SearchForm } from "../../components/SearchForm";
-import { FormContainer, ItemContainer, TableContent } from "./styles";
+import { ActionsContainer, FormContainer, ItemContainer, TableContent } from "./styles";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
@@ -9,8 +9,7 @@ import { useEffect, useState } from "react";
 import { Table } from "../../components/Table";
 import { PencilSimple, TrashSimple } from "phosphor-react";
 import { priceFormatter } from "../../utils/formatter";
-import { Teste } from "../../components/teste";
-
+import { NewItemModal } from "../../components/NewItemModal";
 
 export interface Product {
   id: number;
@@ -85,11 +84,11 @@ export function Produtos() {
 
   const { register, handleSubmit, reset, setValue } = newProductForm;
 
-  function handleAddItem() {
+  function handleClearModal() {
     reset()
     setEditProduct(null)
     setIsModalOpen(true)
-    console.log('teste')
+    console.log('limpou')
   }
 
   function handleCreateProduct(data: NewProductFormData) {
@@ -134,23 +133,7 @@ export function Produtos() {
 
   return (
     <>
-      <Teste />
-      <Header title="Produtos" text={editProduct ? 'Editar produto' : 'Adicionar produto'} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} handleAddItem={handleAddItem}>
-        <FormProvider {...newProductForm}>
-          <FormContainer onSubmit={editProduct ? handleSubmit(handleUpdateProduct): handleSubmit(handleCreateProduct)}>
-            <Form.Input type="text" name="descricao" placeholder="Descrição" />
-            <Form.ErrorMessage field='descricao' />
-            <Form.Input type="number" name="quantidade" placeholder="Quantidade" />
-            <Form.ErrorMessage field='quantidade' />
-            <Form.Input type="number" {...register('preco', {valueAsNumber: true })} placeholder="Preço"  /> 
-            <Form.ErrorMessage field='preco' />
-            <Form.Input type="number" name="peso" placeholder="Peso" />
-            <Form.ErrorMessage field='peso' />
-            
-            <Form.Button type='submit'>{editProduct ? 'Salvar' : 'Cadastrar'}</Form.Button>
-          </FormContainer>
-        </FormProvider>
-      </Header>
+      <Header title="Produtos" text='Adicionar produto'  handleClearModal={handleClearModal} />
       <ItemContainer>
         <SearchForm text="Busque por produtos"/>
         <TableContent>
@@ -185,6 +168,32 @@ export function Produtos() {
           </Table.Body>
         </TableContent>
       </ItemContainer>
+
+      {/* MODAL */}
+      <NewItemModal 
+        isModalOpen={isModalOpen} 
+        setIsModalOpen={setIsModalOpen} 
+        handleClearModal={handleClearModal} 
+        title={editProduct ? 'Editar produto' : 'Cadastrar produto'}
+      >
+        <FormProvider {...newProductForm}>
+          <FormContainer onSubmit={editProduct ? handleSubmit(handleUpdateProduct): handleSubmit(handleCreateProduct)}>
+            <Form.Input type="text" name="descricao" placeholder="Descrição" />
+            <Form.ErrorMessage field='descricao' />
+            <Form.Input type="number" name="quantidade" placeholder="Quantidade" />
+            <Form.ErrorMessage field='quantidade' />
+            <Form.Input type="number" {...register('preco', {valueAsNumber: true })} placeholder="Preço"  /> 
+            <Form.ErrorMessage field='preco' />
+            <Form.Input type="number" name="peso" placeholder="Peso" />
+            <Form.ErrorMessage field='peso' />
+              
+            <ActionsContainer>
+              <Form.Button type='button' onClick={() => setIsModalOpen(false)} variant="secondary">Cancelar</Form.Button>
+              <Form.Button type='submit' variant="primary">{editProduct ? 'Salvar' : 'Cadastrar'}</Form.Button>
+            </ActionsContainer>
+          </FormContainer>
+        </FormProvider>
+      </NewItemModal>
     </> 
   );
 }

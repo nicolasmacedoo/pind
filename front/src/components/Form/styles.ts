@@ -32,11 +32,14 @@ export const ErrorMessageForm = styled.span`
   font-size: 0.75rem;
   line-height: 1rem; 
 `
+interface ActionsButtonProps  {
+  variant?: 'primary' | 'secondary'
+}
 
-export const ButtonForm = styled.button`
+export const ButtonForm = styled.button<ActionsButtonProps>`
   height: 58px;
   border: 0;
-  background: ${props => props.theme.color['green-700']};
+  background: ${props => props.variant === 'primary' ? props.theme.color['green-700'] : props.theme.color['red-700']};
   color: ${props => props.theme.color.white};
   font-weight: bold;
   padding: 0 1.25rem;
@@ -51,7 +54,7 @@ export const ButtonForm = styled.button`
   }
 
   &:not(:disabled):hover {
-    background: ${props => props.theme.color['green-500']};
+    background: ${props => props.variant === 'primary' ? props.theme.color['green-500'] : props.theme.color['red-500']};
     transition: background-color 0.2s;
   }
 `

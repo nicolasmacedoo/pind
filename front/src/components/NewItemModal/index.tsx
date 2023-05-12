@@ -1,31 +1,41 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { ClosedButton, Content, Overlay } from './styles'
 import { X } from 'phosphor-react'
-import { ReactNode } from 'react'
+import { ReactNode, forwardRef, ForwardedRef } from 'react'
 
-type ItemsModalProps = {
+interface ItemsModalProps {
   title: string
   children: ReactNode
-  handleAddItem: () => void
+  handleClearModal: () => void
+  isModalOpen: boolean
+  setIsModalOpen: (value: boolean) => void
   //TODO: contexto para evitar props drilling?
 }
 
-export function NewItemModal({ title, children, handleAddItem }: ItemsModalProps) {
+// 
+
+export const NewItemModal = forwardRef(
+  (
+    { title, children, handleClearModal, isModalOpen, setIsModalOpen }: ItemsModalProps,
+    ref: ForwardedRef<HTMLDivElement>
+  ) => {
   
   return (
-    <Dialog.Portal>
-      <Overlay />
+    <Dialog.Root open={isModalOpen} onOpenChange={setIsModalOpen}>  
+      <Dialog.Portal>
+        <Overlay />
 
-      <Content onEscapeKeyDown={handleAddItem} onInteractOutside={handleAddItem}>
-        <Dialog.Title>{title}</Dialog.Title>
+        <Content onEscapeKeyDown={handleClearModal} onInteractOutside={handleClearModal} ref={ref}>
+          <Dialog.Title>{title}</Dialog.Title>
 
-        <ClosedButton>
-          <X size={24} weight='bold'/>
-        </ClosedButton>
+          <ClosedButton>
+            <X size={24} weight='bold'/>
+          </ClosedButton>
 
-        {children}
+          {children}
 
-      </Content>
-    </Dialog.Portal>
+        </Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
-} 
+})
