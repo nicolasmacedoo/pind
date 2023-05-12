@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Table } from "../../components/Table";
 import { PencilSimple, TrashSimple } from "phosphor-react";
 import { priceFormatter } from "../../utils/formatter";
+import { Teste } from "../../components/teste";
 
 
 export interface Product {
@@ -49,6 +50,13 @@ const productsList: Product[] = [
     quantidade: '10',
     peso: '535'
   },
+  {
+    id: 5,
+    descricao: 'Produto 5',
+    preco: 450,
+    quantidade: '10',
+    peso: '535'
+  }
 ]
 
 const newProductFormSchema = z.object({
@@ -126,6 +134,7 @@ export function Produtos() {
 
   return (
     <>
+      <Teste />
       <Header title="Produtos" text={editProduct ? 'Editar produto' : 'Adicionar produto'} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} handleAddItem={handleAddItem}>
         <FormProvider {...newProductForm}>
           <FormContainer onSubmit={editProduct ? handleSubmit(handleUpdateProduct): handleSubmit(handleCreateProduct)}>
