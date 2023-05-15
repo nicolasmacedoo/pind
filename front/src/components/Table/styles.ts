@@ -7,7 +7,7 @@ export const TableRow = styled.tr`
 
   td:last-child {
     display: flex;
-    justify-content: space-between;
+    gap: 2rem;
   }
 
   td:last-child > button:last-child:hover{

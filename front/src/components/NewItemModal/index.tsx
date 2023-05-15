@@ -12,8 +12,6 @@ interface ItemsModalProps {
   //TODO: contexto para evitar props drilling?
 }
 
-// 
-
 export const NewItemModal = forwardRef(
   (
     { title, children, handleClearModal, isModalOpen, setIsModalOpen }: ItemsModalProps,
@@ -39,3 +37,25 @@ export const NewItemModal = forwardRef(
     </Dialog.Root>
   )
 })
+
+// export function NewItemModal({ title, children, handleClearModal, isModalOpen, setIsModalOpen }: ItemsModalProps) {
+  
+//   return (
+//         <Dialog.Root open={isModalOpen} onOpenChange={setIsModalOpen}>  
+//           <Dialog.Portal>
+//             <Overlay />
+    
+//             <Content onEscapeKeyDown={handleClearModal} onInteractOutside={handleClearModal}>
+//               <Dialog.Title>{title}</Dialog.Title>
+    
+//               <ClosedButton>
+//                 <X size={24} weight='bold'/>
+//               </ClosedButton>
+    
+//               {children}
+    
+//             </Content>
+//           </Dialog.Portal>
+//         </Dialog.Root>
+//       )
+// } 

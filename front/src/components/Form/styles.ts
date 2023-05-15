@@ -39,7 +39,7 @@ interface ActionsButtonProps  {
 export const ButtonForm = styled.button<ActionsButtonProps>`
   height: 58px;
   border: 0;
-  background: ${props => props.variant === 'primary' ? props.theme.color['green-700'] : props.theme.color['red-700']};
+  background: ${props => props.variant === 'secondary' ? props.theme.color['red-700'] : props.theme.color['green-700']};
   color: ${props => props.theme.color.white};
   font-weight: bold;
   padding: 0 1.25rem;

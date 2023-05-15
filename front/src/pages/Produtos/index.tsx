@@ -59,10 +59,14 @@ const productsList: Product[] = [
 ]
 
 const newProductFormSchema = z.object({
-  descricao: z.string()
-    .nonempty('Descrição é obrigatária'),
+  descricao: z.string({
+    required_error: 'Descrição é obrigatoria',
+  })
+    .nonempty('Descrição é obrigatoria'),
   quantidade: z.string(),
-  preco: z.number(),
+  preco: z.number({
+    invalid_type_error: 'Preço é obrigatorio',
+  }),
   peso: z.string(),
 })
 
@@ -96,7 +100,6 @@ export function Produtos() {
       id: Math.floor(Math.random() * 1000),
       ...data
     }])
-    console.log(data)
     //reset()
     setEditProduct(null)
     setIsModalOpen(false)
@@ -178,13 +181,13 @@ export function Produtos() {
       >
         <FormProvider {...newProductForm}>
           <FormContainer onSubmit={editProduct ? handleSubmit(handleUpdateProduct): handleSubmit(handleCreateProduct)}>
-            <Form.Input type="text" name="descricao" placeholder="Descrição" />
+            <Form.Input type="text" {...register('descricao')} placeholder="Descrição" />
             <Form.ErrorMessage field='descricao' />
-            <Form.Input type="number" name="quantidade" placeholder="Quantidade" />
+            <Form.Input type="number" {...register('quantidade')} placeholder="Quantidade" />
             <Form.ErrorMessage field='quantidade' />
             <Form.Input type="number" {...register('preco', {valueAsNumber: true })} placeholder="Preço"  /> 
             <Form.ErrorMessage field='preco' />
-            <Form.Input type="number" name="peso" placeholder="Peso" />
+            <Form.Input type="number" {...register('peso')} placeholder="Peso" />
             <Form.ErrorMessage field='peso' />
               
             <ActionsContainer>

@@ -6,7 +6,19 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(( props, ref) => {
+// export function Input(props: InputProps) {
+//   const { register } = useFormContext()
+
+//   return (
+//     <InputForm
+//       id={props.name}
+//       {...register(props.name)}
+//       {...props}
+//     />
+//   )
+// }
+
+export const Input = forwardRef<HTMLInputElement, InputProps>(( props: InputProps, ref) => {
   const { register } = useFormContext()
 
   return (

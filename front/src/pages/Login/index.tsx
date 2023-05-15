@@ -4,7 +4,12 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form } from '../../components/Form';
-import { ErrorSpan, FormContainer } from './styles';
+import { BgContent, Container, ErrorSpan, FormContainer } from './styles';
+
+import bg from '../../assets/plantacao.jpg'
+import logo from '../../assets/logo.svg'
+
+
 
 const signInFormSchema = z.object({
   email: z.string()
@@ -26,6 +31,7 @@ export function Login() {
 
   const { 
     handleSubmit, 
+    register
   } = signInForm
 
   async function handleSignIn(data: SignInFormData) {
@@ -35,27 +41,31 @@ export function Login() {
   }
 
   return ( 
-    <FormProvider {...signInForm}>
-      <FormContainer onSubmit={handleSubmit(handleSignIn)}>
-        <Form.Field>
-          <Form.Label>E-mail</Form.Label>
-          <Form.Input type='text' name='email' />
-          <Form.ErrorMessage field='email' />
-        </Form.Field>
+    <Container>
+      <BgContent style={{ backgroundImage: `url(${bg})` }}>
+        <img src={logo} alt="" />
+        <h1>Gestão inteligente <br /> do seu <br /> <span>Estoque</span></h1>
+      </BgContent>
+      <FormProvider {...signInForm}>
+        <FormContainer onSubmit={handleSubmit(handleSignIn)}>
+          <Form.Field>
+            <Form.Label>E-mail</Form.Label>
+            <Form.Input type='text' {...register('email')} />
+            <Form.ErrorMessage field='email' />
+          </Form.Field>
 
-        <Form.Field>
-          <Form.Label>Senha</Form.Label>
-          <Form.Input type='password' name='password' />
-          <Form.ErrorMessage field='password' />
-        </Form.Field>
+          <Form.Field>
+            <Form.Label>Senha</Form.Label>
+            <Form.Input type='password' {...register('password')} />
+            <Form.ErrorMessage field='password' />
+          </Form.Field>
 
-        {/* TODO: mostrar mensagem de senha incorreta */}
+          {errorMessage && <ErrorSpan>{errorMessage}</ErrorSpan>}
 
-        {errorMessage && <ErrorSpan>{errorMessage}</ErrorSpan>}
-
-        <Form.Button type='submit'>Entrar</Form.Button>
-      </FormContainer>
-    </FormProvider>
+          <Form.Button type='submit'>Entrar</Form.Button>
+        </FormContainer>
+      </FormProvider>
+    </Container>
   )
 }
 
