@@ -2,11 +2,13 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Form } from "../../components/Form";
 import { Header } from "../../components/Header";
 import { SearchForm } from "../../components/SearchForm";
-import { FormContainer, ItemContainer, TableContent } from "./styles";
+import { ActionsContainer, FormContainer, ItemContainer, TableContent } from "./styles";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Table } from "../../components/Table";
+import { PencilSimple, TrashSimple } from "phosphor-react";
+import { NewItemModal } from "../../components/NewItemModal";
 
 export interface Fornecedor {
   id: number
@@ -54,6 +56,7 @@ type NewFornecedorFormData = z.infer<typeof newFornecedorFormSchema>
 export function Fornecedores() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [editFornecedor, setEditFornecedor] = useState<Fornecedor | null>(null);
 
   useEffect(() => {
     setFornecedores(fornecedoresList)
@@ -63,36 +66,50 @@ export function Fornecedores() {
     resolver: zodResolver(newFornecedorFormSchema)
   })
 
-  const { handleSubmit, reset } = newFornecedorForm;
+  const { handleSubmit, reset, register, setValue } = newFornecedorForm;
+
+  function handleClearModal() {
+    reset();
+    setEditFornecedor(null);
+    setIsModalOpen(true);
+  }
 
   function handleCreateFornecedor(data: NewFornecedorFormData) {
     setFornecedores(state => [...state, {
       id: Math.floor(Math.random() * 1000),
       ...data
     }])
-    console.log(data)
-    reset()
-    //codigo fechar o modal
+
     setIsModalOpen(false)
+  }
+
+  function handleEditFornecedor(fornecedor: Fornecedor) {
+    setEditFornecedor(fornecedor);
+    
+    setValue('nome', fornecedor.nome);
+    setValue('cpf', fornecedor.cpf);
+    setValue('telefone', fornecedor.telefone);
+
+    setIsModalOpen(true);
+  }
+
+  function handleUpdateFornecedor(data: NewFornecedorFormData) {
+    setFornecedores(state => 
+      state.map(fornecedor => 
+        fornecedor.id === editFornecedor?.id ? {...fornecedor, ...data} : fornecedor
+      )
+    )
+    setIsModalOpen(false);
+  }
+
+  function handleDeleteFornecedor(fornecedor: Fornecedor) {
+    setFornecedores(state => state.filter(fornecedorState => fornecedorState.id !== fornecedor.id))
   }
 
   return (
     <>
-      <Header title="Fornecedores" text="Novo Fornecedor" isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-      <FormProvider {...newFornecedorForm}>
-        <FormContainer onSubmit={handleSubmit(handleCreateFornecedor)}>
-          <Form.Input type="text" name="nome" placeholder="Nome" />
-          <Form.ErrorMessage field='nome' />
-          <Form.Input type="text" name="cpf" placeholder="CPF" />
-          <Form.ErrorMessage field='cpf' />
-          <Form.Input type="text " name="telefone" placeholder="Telefone" />
-          <Form.ErrorMessage field='cpf' />
-          
-          <Form.Button type='submit'>Cadastrar</Form.Button>
-          {/* TODO: fechar o formulario e atualizar a lista de produtos */}
-        </FormContainer>
-      </FormProvider>
-      </Header>
+      <Header title="Fornecedores" text="Novo Fornecedor" handleClearModal={handleClearModal} />
+      
       <ItemContainer>
         <SearchForm text="Busque por fornecedores"/>
         <TableContent>
@@ -101,6 +118,7 @@ export function Fornecedores() {
               <Table.Head>Nome</Table.Head>
               <Table.Head>CPF</Table.Head>
               <Table.Head>Telefone</Table.Head>
+              <Table.Head>Actions</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -110,12 +128,44 @@ export function Fornecedores() {
                   <Table.Data>{fornecedor.nome}</Table.Data>
                   <Table.Data>{fornecedor.cpf}</Table.Data>
                   <Table.Data>{fornecedor.telefone}</Table.Data>
+                  <Table.Data>
+                    <button onClick={() => handleEditFornecedor(fornecedor)}>
+                      <PencilSimple size={24} weight="bold"/>
+                    </button>
+                    <button onClick={() => handleDeleteFornecedor(fornecedor)}>
+                      <TrashSimple size={24} weight="bold"/>
+                    </button>
+                  </Table.Data>
                 </Table.Row>
               )
             })}
           </Table.Body>
         </TableContent>
       </ItemContainer>
+
+      {/* MODAL */}
+      <NewItemModal 
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        handleClearModal={handleClearModal}
+        title={editFornecedor ? 'Editar Fornecedor' : 'Novo Fornecedor'}
+      >
+        <FormProvider {...newFornecedorForm}>
+          <FormContainer onSubmit={editFornecedor ? handleSubmit(handleUpdateFornecedor) : handleSubmit(handleCreateFornecedor)}>
+            <Form.Input type="text" {...register('nome')} placeholder="Nome" />
+            <Form.ErrorMessage field='nome' />
+            <Form.Input type="text" {...register('cpf')} placeholder="CPF" />
+            <Form.ErrorMessage field='cpf' />
+            <Form.Input type="text " {...register('telefone')} placeholder="Telefone" />
+            <Form.ErrorMessage field='cpf' />
+            
+            <ActionsContainer>
+              <Form.Button type='button' onClick={() => setIsModalOpen(false)} variant="secondary">Cancelar</Form.Button>
+              <Form.Button type='submit' variant="primary">{editFornecedor ? 'Salvar' : 'Cadastrar'}</Form.Button>
+            </ActionsContainer>
+          </FormContainer>
+        </FormProvider>
+      </NewItemModal>
     </>
   )
 }
