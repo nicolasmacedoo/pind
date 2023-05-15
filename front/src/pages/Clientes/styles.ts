@@ -17,6 +17,12 @@ export const FormContainer = styled.form`
   gap: 1rem;
 `
 
+export const ActionsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+`
+
 export const TableContent = styled.table`
   width: 100%;
   border-collapse: separate;
