@@ -25,6 +25,12 @@ export const TableContent = styled.table`
   margin-top: 1.5rem;
 `
 
+export const ActionsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+`
+
 export const TransactionType = styled(RadioGroup.Root)`
   display: grid;
   grid-template-columns: repeat(2, 1fr);

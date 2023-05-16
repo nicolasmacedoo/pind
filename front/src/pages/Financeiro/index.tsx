@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Header } from "../../components/Header";
-import { FormContainer, ItemContainer, PriceHighlight, TableContent, TransactionType, TransactionTypeButton } from "./styles";
+import { ActionsContainer, FormContainer, ItemContainer, PriceHighlight, TableContent, TransactionType, TransactionTypeButton } from "./styles";
 import { SearchForm } from "../../components/SearchForm";
 import { Table } from "../../components/Table";
 import { ArrowCircleDown, ArrowCircleUp, PencilSimple, TrashSimple } from "phosphor-react";
@@ -11,6 +11,7 @@ import { Form } from "../../components/Form";
 import { Summary } from "../../components/Summary";
 import { TransactionsContext } from "../../contexts/TransactionsContext";
 import { dateFormatter, priceFormatter } from "../../utils/formatter";
+import { NewItemModal } from "../../components/NewItemModal";
 
 export interface Transaction {
   id: number;
@@ -77,50 +78,21 @@ export function Financeiro() {
   }
     
     
-
-  function handleAddItem() {
+  function handleClearModal() {
     reset();
-    setIsModalOpen(true);
     setSelectedTransaction(null);
+    setIsModalOpen(true);
   }
 
   return (
     //colocar provider no app? 
     <>
-      <Header title="Financeiro" text={selectedTransaction ? "Editar transação" : "Nova transação"} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} handleAddItem={handleAddItem} >
-        <FormProvider {...newTransactionForm}>
-          <FormContainer onSubmit={selectedTransaction ? handleSubmit(handleUpdateTransaction) : handleSubmit(handleCreateTransaction)}>
-            <Form.Input type="text" name="descricao" placeholder="Descrição" />
-            <Form.ErrorMessage field='descricao' />
-            <Form.Input type="number" {...register('preco', {valueAsNumber: true })} placeholder="Preço" />
-            <Form.ErrorMessage field='preco' />
-            <Form.Input type="text " name="categoria" placeholder="Categoria" />
-            <Form.ErrorMessage field='categoria' />
-            
-            <Controller
-              control={control}
-              name='type'
-              render={({ field }) => {
-                return (
-                  <TransactionType onValueChange={field.onChange} value={field.value}>
-                    <TransactionTypeButton variant='income' value='income'>
-                      <ArrowCircleUp size={24} />
-                      Entrada
-                    </TransactionTypeButton>
-
-                    <TransactionTypeButton variant='outcome' value='outcome'>
-                      <ArrowCircleDown size={24} />
-                      Saida
-                    </TransactionTypeButton>
-                   </TransactionType>
-                )
-              }}
-            />
-
-            <Form.Button type='submit'>{selectedTransaction ? "Salvar" : "Cadastrar"}</Form.Button>
-          </FormContainer>
-        </FormProvider>
-      </Header>
+      <Header 
+        title="Financeiro" 
+        text={selectedTransaction ? "Editar transação" : "Nova transação"} 
+        handleClearModal={handleClearModal}
+      />
+        
       <Summary />
       <ItemContainer>
         <SearchForm text="Busque por uma transção" />
@@ -161,6 +133,50 @@ export function Financeiro() {
           </Table.Body>
         </TableContent>
       </ItemContainer>
+
+      {/* MODAL */}
+      <NewItemModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        handleClearModal={handleClearModal}
+        title={selectedTransaction ? "Editar transação" : "Nova transação"}
+      >
+        <FormProvider {...newTransactionForm}>
+          <FormContainer onSubmit={selectedTransaction ? handleSubmit(handleUpdateTransaction) : handleSubmit(handleCreateTransaction)}>
+            <Form.Input type="text" {...register('descricao')} placeholder="Descrição" />
+            <Form.ErrorMessage field='descricao' />
+            <Form.Input type="number" {...register('preco', {valueAsNumber: true })} placeholder="Preço" />
+            <Form.ErrorMessage field='preco' />
+            <Form.Input type="text" {...register('categoria')} placeholder="Categoria" />
+            <Form.ErrorMessage field='categoria' />
+            
+            <Controller
+              control={control}
+              name='type'
+              render={({ field }) => {
+                return (
+                  <TransactionType onValueChange={field.onChange} value={field.value}>
+                    <TransactionTypeButton variant='income' value='income'>
+                      <ArrowCircleUp size={24} />
+                      Entrada
+                    </TransactionTypeButton>
+
+                    <TransactionTypeButton variant='outcome' value='outcome'>
+                      <ArrowCircleDown size={24} />
+                      Saida
+                    </TransactionTypeButton>
+                   </TransactionType>
+                )
+              }}
+            />
+
+            <ActionsContainer>
+              <Form.Button type='button' onClick={() => setIsModalOpen(false)} variant="secondary">Cancelar</Form.Button>
+              <Form.Button type='submit' variant="primary">{selectedTransaction ? 'Salvar' : 'Cadastrar'}</Form.Button>
+            </ActionsContainer>
+          </FormContainer>
+        </FormProvider>
+      </NewItemModal>
     </>
   );
 }
