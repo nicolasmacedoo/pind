@@ -20,13 +20,13 @@ model User {
 
 model Product {
   id               String  @id @default(uuid())
+  user_id          String
   name             String
   price            Decimal @db.Money
   quantity         Decimal @db.Decimal(6, 2)
   unit_measurement String
 
-  user    User   @relation(fields: [user_id], references: [id])
-  user_id String
+  user User @relation(fields: [user_id], references: [id])
 
   @@map("products")
 }
