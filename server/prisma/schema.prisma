@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
+  id            String     @id @default(uuid())
   name          String
-  email         String    @unique
+  email         String     @unique
   password_hash String
-  created_at    DateTime  @default(now())
+  created_at    DateTime   @default(now())
   products      Product[]
   clients       Client[]
+  suppliers     Supplier[]
 
   @@map("users")
 }
@@ -42,4 +43,16 @@ model Client {
   user User @relation(fields: [user_id], references: [id])
 
   @@map("clients")
+}
+
+model Supplier {
+  id      String @id @default(uuid())
+  user_id String
+  name    String
+  cnpj    String @unique
+  phone   String
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("suppliers")
 }
