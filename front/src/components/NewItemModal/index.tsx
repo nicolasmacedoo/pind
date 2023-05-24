@@ -26,7 +26,7 @@ export const NewItemModal = forwardRef(
         <Content onEscapeKeyDown={handleClearModal} onInteractOutside={handleClearModal} ref={ref}>
           <Dialog.Title>{title}</Dialog.Title>
 
-          <ClosedButton>
+          <ClosedButton onClick={handleClearModal}>
             <X size={24} weight='bold'/>
           </ClosedButton>
 

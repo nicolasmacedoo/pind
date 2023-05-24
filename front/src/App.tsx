@@ -5,8 +5,6 @@ import { ThemeProvider } from "styled-components";
 import { defaultTheme } from "./styles/themes/default";
 import { GlobalStyle } from "./styles/global";
 import { TransactionsProvider } from "./contexts/TransactionsContext";
-import { ProductsProvider } from "./contexts/ProductsContext";
-
 
 export function App() {
   return(
@@ -15,9 +13,7 @@ export function App() {
       <BrowserRouter>
         <AuthProvider>
           <TransactionsProvider>
-            <ProductsProvider>
               <Router />
-            </ProductsProvider>
           </TransactionsProvider>
         </AuthProvider>
       </BrowserRouter>

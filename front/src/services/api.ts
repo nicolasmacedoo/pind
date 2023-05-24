@@ -11,10 +11,10 @@ interface FailedRequest {
   onFailure: (error: AxiosError) => void;
 }
 
-interface ApiError {
-  code: string;
-  message: string;
-}
+// interface ApiError {
+//   code: string;
+//   message: string;
+// }
 
 
 let cookies = parseCookies();

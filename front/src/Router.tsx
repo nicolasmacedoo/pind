@@ -10,6 +10,7 @@ import { Fornecedores } from "./pages/Fornecedores";
 import { Financeiro } from "./pages/Financeiro";
 import { Vendas } from "./pages/Vendas";
 import { Compras } from "./pages/Compras";
+import { ProductsProvider } from "./contexts/ProductsContext";
 
 export function Router() {
   
@@ -18,7 +19,14 @@ export function Router() {
       <Route path="/" element={<Login />} /> 
       <Route path="/" element={<DefaultLayout />}>
         <Route path="/home" element={<Home />} />
-        <Route path="/produtos" element={<Produtos />} />
+        <Route 
+          path="/produtos" 
+          element={
+            <ProductsProvider> 
+              <Produtos />
+            </ProductsProvider>
+          } 
+        />
         <Route path="/clientes" element={<Clientes />} />
         <Route path="/fornecedores" element={<Fornecedores />} />
         <Route path="/financeiro" element={<Financeiro />} />

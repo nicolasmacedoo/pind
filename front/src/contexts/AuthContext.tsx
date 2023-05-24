@@ -81,8 +81,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       api.defaults.headers['Authorization'] = `Bearer ${token}`
 
-      navigate('/dashboard')
-      //navigate('/produtos')
+      //navigate('/dashboard')
+      navigate('/produtos')
 
       return 'Sucesso'
 

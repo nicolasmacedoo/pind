@@ -57,6 +57,7 @@ export function Produtos() {
 
   const { register, handleSubmit, reset, setValue } = newProductForm;
 
+
   function handleClearModal() {
     reset()
     // //setEditProduct(null) comentado
