@@ -14,6 +14,7 @@ model User {
   password_hash String
   created_at    DateTime  @default(now())
   products      Product[]
+  clients       Client[]
 
   @@map("users")
 }
@@ -29,4 +30,16 @@ model Product {
   user User @relation(fields: [user_id], references: [id])
 
   @@map("products")
+}
+
+model Client {
+  id      String @id @default(uuid())
+  user_id String
+  name    String
+  cpf     String @unique
+  phone   String
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("clients")
 }
