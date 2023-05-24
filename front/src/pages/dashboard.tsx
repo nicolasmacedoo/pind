@@ -7,6 +7,7 @@ import { Link } from "react-router-dom"
 
 export function Dashboard() {
   const { user } = useContext(AuthContext)
+  console.log(user)
 
   const userCanSeeMetrics = useCan({
     roles: ['administrator']

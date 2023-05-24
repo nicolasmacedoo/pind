@@ -30,20 +30,26 @@ export const api = axios.create({
 
 api.interceptors.response.use((response: AxiosResponse) => { 
   return response;
-}, (error: AxiosError<ApiError>) => {
+}, (error: AxiosError) => {
   if (error.response?.status === 401) {
-    if (error.response.data?.code === 'token.expired') {
+    // if (error.response.data?.code === 'token.expired') {
       cookies = parseCookies();
-
+      
       const { 'pind.refreshToken': refreshToken } = cookies;
       const originalConfig = error.config as AxiosRequestConfig;
-
+      const regreshh = cookies['pind.refreshToken']
+      
       if(!isRefreshing) {
         isRefreshing = true
+        console.log("cehgou", cookies['pind.refreshToken'])
 
-        api.post<RefreshTokenResponse>('/refresh', { 
-          refreshToken,
-        }).then(response => {
+        api.patch<RefreshTokenResponse>('/token/refresh', { 
+          regreshh,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${refreshToken}`
+        }}).then(response => {
           const { token } = response.data;
   
           setCookie(undefined, 'pind.token', token, {
@@ -80,10 +86,10 @@ api.interceptors.response.use((response: AxiosResponse) => {
           }
         })
       })
-    } else {
-      //deslogar usuario
+    // } else {
+    //   //deslogar usuario
       
-    }
+    // }
   }
 
   return Promise.reject(error)

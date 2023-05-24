@@ -5,82 +5,51 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form } from "../../components/Form";
-import { useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Table } from "../../components/Table";
 import { PencilSimple, TrashSimple } from "phosphor-react";
-import { priceFormatter } from "../../utils/formatter";
+import { priceFormatter, quantityFormatter } from "../../utils/formatter";
 import { NewItemModal } from "../../components/NewItemModal";
+import { ProductsContext } from "../../contexts/ProductsContext";
 
-export interface Product {
-  id: number;
-  descricao: string;
-  preco: number;
-  quantidade: string;
-  peso: string;
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  unit_measurement: string;
+  userId: string
 }
 
-const productsList: Product[] = [
-  {
-    id: 1,
-    descricao: 'Produto 1',
-    preco: 100,
-    quantidade: '10',
-    peso: '535'
-  },
-  
-  {
-    id: 2,
-    descricao: 'Produto 25',
-    preco: 100,
-    quantidade: '10',
-    peso: '535'
-  },
-  {
-    id: 3,
-    descricao: 'Produto 3',
-    preco: 100,
-    quantidade: '10',
-    peso: '535'
-  },
-  {
-    id: 4,
-    descricao: 'Produto 4',
-    preco: 100,
-    quantidade: '10',
-    peso: '535'
-  },
-  {
-    id: 5,
-    descricao: 'Produto 5',
-    preco: 450,
-    quantidade: '10',
-    peso: '535'
-  }
-]
+interface UpdateProductInput {
+  id?: string;
+  name?: string;
+  price?: number;
+  quantity?: number;
+  unit_measurement?: string;
+  userId?: string
+}
 
 const newProductFormSchema = z.object({
-  descricao: z.string({
-    required_error: 'Descrição é obrigatoria',
+  name: z.string({
+    required_error: 'Nome é obrigatorio',
   })
     .nonempty('Descrição é obrigatoria'),
-  quantidade: z.string(),
-  preco: z.number({
-    invalid_type_error: 'Preço é obrigatorio',
-  }),
-  peso: z.string(),
+    price: z.number({
+      invalid_type_error: 'Preço é obrigatorio',
+    }),
+  quantity: z.number(),
+  unitMeasurement: z.string(),
 })
 
 type NewProductFormData = z.infer<typeof newProductFormSchema>
 
 export function Produtos() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [editProduct, setEditProduct] = useState<Product | null>(null);
-
-  useEffect(() => {
-    setProducts(productsList)
-  }, [])
+  const { products, createProduct, updateProduct, deleteProduct } = useContext(ProductsContext)
   
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  //const [editProduct, setEditProduct] = useState<Product>({} as Product);
 
   const newProductForm = useForm<NewProductFormData>({
     resolver: zodResolver(newProductFormSchema),
@@ -90,47 +59,42 @@ export function Produtos() {
 
   function handleClearModal() {
     reset()
-    setEditProduct(null)
+    // //setEditProduct(null) comentado
     setIsModalOpen(true)
     console.log('limpou')
   }
 
-  function handleCreateProduct(data: NewProductFormData) {
-    setProducts(state => [...state, {
-      id: Math.floor(Math.random() * 1000),
-      ...data
-    }])
-    //reset()
-    setEditProduct(null)
-    setIsModalOpen(false)
-  }
-
   function handleEditProduct(product: Product) {
-    console.log('handleeditproduct')
+    console.log(product)
     setEditProduct(product)
     // reset(product)
-    setValue('descricao', product.descricao)
-    setValue('quantidade', product.quantidade)
-    setValue('preco', product.preco)
-    setValue('peso', product.peso)
+    setValue('name', product.name)
+    setValue('quantity', product.quantity)
+    setValue('price', product.price)
+    setValue('unitMeasurement', product.unit_measurement)
     setIsModalOpen(true)
   }
 
-  function handleUpdateProduct(data: NewProductFormData) {
-    console.log('atualizar')
-    setProducts(state =>
-      state.map(product =>
-        product.id === editProduct?.id ? { ...editProduct, ...data } : product
-      )
-    )
-    reset()
-    setEditProduct(null)
+  function handleCreateProduct(data: NewProductFormData) {
+    createProduct(data)
+    //setEditProduct(null)
     setIsModalOpen(false)
   }
 
-  function handleDeleteProduct(product: Product) {
-    setProducts(state => state.filter(productItem => productItem.id !== product.id))
-    setEditProduct(null)
+  
+  function handleUpdateProduct(data: UpdateProductInput) {
+    if (editProduct) {
+      updateProduct(editProduct.id, data)
+      reset()
+      //setEditProduct(null)
+      setIsModalOpen(false)
+    }
+  }
+
+  function handleDeleteProduct(id: string) {
+    deleteProduct(id)
+    
+    //setEditProduct(null)
     setIsModalOpen(false)
   }
 
@@ -145,7 +109,7 @@ export function Produtos() {
               <Table.Head>Descrição</Table.Head>
               <Table.Head>Preço</Table.Head>
               <Table.Head>Quantidade</Table.Head>
-              <Table.Head>Peso</Table.Head>
+              <Table.Head>Unidade Medida</Table.Head>
               <Table.Head>Actions</Table.Head>
             </Table.Row>
           </Table.Header>
@@ -153,15 +117,15 @@ export function Produtos() {
             {products.map(product => {
               return (
                 <Table.Row key={product.id}>
-                  <Table.Data>{product.descricao}</Table.Data>
-                  <Table.Data>{priceFormatter.format(product.preco)}</Table.Data>
-                  <Table.Data>{product.quantidade}</Table.Data>
-                  <Table.Data>{product.peso}</Table.Data>
+                  <Table.Data>{product.name}</Table.Data>
+                  <Table.Data>{priceFormatter.format(product.price)}</Table.Data>
+                  <Table.Data>{quantityFormatter.format(product.quantity)}</Table.Data>
+                  <Table.Data>{product.unit_measurement}</Table.Data>
                   <Table.Data>
                     <button onClick={() => handleEditProduct(product)}>
                       <PencilSimple size={24} weight="bold"/>
                     </button>
-                    <button onClick={() => handleDeleteProduct(product)}>
+                    <button onClick={() => handleDeleteProduct(product.id)}>
                       <TrashSimple size={24} weight="bold"/>
                     </button>
                   </Table.Data>
@@ -181,14 +145,14 @@ export function Produtos() {
       >
         <FormProvider {...newProductForm}>
           <FormContainer onSubmit={editProduct ? handleSubmit(handleUpdateProduct): handleSubmit(handleCreateProduct)}>
-            <Form.Input type="text" {...register('descricao')} placeholder="Descrição" />
-            <Form.ErrorMessage field='descricao' />
-            <Form.Input type="number" {...register('quantidade')} placeholder="Quantidade" />
-            <Form.ErrorMessage field='quantidade' />
-            <Form.Input type="number" {...register('preco', {valueAsNumber: true })} placeholder="Preço"  /> 
-            <Form.ErrorMessage field='preco' />
-            <Form.Input type="number" {...register('peso')} placeholder="Peso" />
-            <Form.ErrorMessage field='peso' />
+            <Form.Input type="text" {...register('name')} placeholder="Descrição" />
+            <Form.ErrorMessage field='name' />
+            <Form.Input type="text" {...register('quantity', {valueAsNumber: true })} placeholder="Quantidade" />
+            <Form.ErrorMessage field='quantity' />
+            <Form.Input type="text" {...register('price', {valueAsNumber: true })} placeholder="Preço"  /> 
+            <Form.ErrorMessage field='price' />
+            <Form.Input type="text" {...register('unitMeasurement')} placeholder="Unidade de Medida" />
+            <Form.ErrorMessage field='unitMeasurement' />
               
             <ActionsContainer>
               <Form.Button type='button' onClick={() => setIsModalOpen(false)} variant="secondary">Cancelar</Form.Button>

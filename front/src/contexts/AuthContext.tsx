@@ -6,8 +6,9 @@ import { setCookie, parseCookies, destroyCookie } from "nookies";
 
 type User = {
   email: string;
-  permissions: string[];
-  roles: string[];
+  id: string
+  // permissions: string[];
+  // roles: string[];
 }
 
 type SignInCredentials = {
@@ -38,9 +39,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     if (token) {
       api.get('/me').then(response => {	
-        const { email, permissions, roles } = response.data;
+        const { email, id } = response.data;
 
-        setUser({ email, permissions, roles })
+        setUser({ email, id })
       })
       .catch(() => {
         destroyCookie(undefined, 'pind.token')
@@ -61,7 +62,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         password
       })
 
-      const { token, refreshToken, permissions, roles } = response.data;
+      const { token, refreshToken, user } = response.data      
 
       setCookie(undefined, 'pind.token', token, {
         maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -75,13 +76,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       setUser({
         email,
-        permissions,
-        roles
+        id: user.id
       })
 
       api.defaults.headers['Authorization'] = `Bearer ${token}`
 
       navigate('/dashboard')
+      //navigate('/produtos')
 
       return 'Sucesso'
 
