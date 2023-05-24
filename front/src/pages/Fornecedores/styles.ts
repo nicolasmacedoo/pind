@@ -1,12 +1,11 @@
-import styled from "styled-components";
-
+import styled from 'styled-components'
 
 export const ItemContainer = styled.main`
   width: 100%;
   max-width: 1576px;
   margin: 4rem auto 0;
   padding: 0 1.5rem;
-  color: ${props => props.theme.color["gray-100"]};
+  color: ${(props) => props.theme.color['gray-100']};
 `
 
 export const FormContainer = styled.form`

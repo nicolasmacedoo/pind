@@ -1,6 +1,11 @@
-import { HeaderContainer, HeaderContent, HeaderImage, HeaderTitle, NewItemButton } from "./style";
+import {
+  HeaderContainer,
+  HeaderContent,
+  HeaderImage,
+  HeaderTitle,
+  NewItemButton,
+} from './style'
 import logo from '../../assets/text-logo.png'
-
 
 interface HeaderProps {
   title: string
@@ -8,10 +13,9 @@ interface HeaderProps {
   handleClearModal: () => void
 }
 
-
 export function Header({ title, text, handleClearModal }: HeaderProps) {
   return (
-    <HeaderContainer>  
+    <HeaderContainer>
       <HeaderContent>
         <HeaderImage>
           <img src={logo} alt="" />
@@ -21,7 +25,7 @@ export function Header({ title, text, handleClearModal }: HeaderProps) {
           {/* <NewItemButton onClick={handleAddItem}>{text}</NewItemButton> */}
           <NewItemButton onClick={handleClearModal}>{text}</NewItemButton>
         </HeaderTitle>
-    </HeaderContent>
-  </HeaderContainer>
+      </HeaderContent>
+    </HeaderContainer>
   )
 }

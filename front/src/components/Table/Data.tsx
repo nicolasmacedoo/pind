@@ -1,8 +1,6 @@
-import { TableHTMLAttributes } from "react";
-import { TableData } from "./styles";
+import { TableHTMLAttributes } from 'react'
+import { TableData } from './styles'
 
 export function Data(props: TableHTMLAttributes<HTMLTableCellElement>) {
-  return (
-    <TableData {...props}></TableData>
-  )
+  return <TableData {...props}></TableData>
 }

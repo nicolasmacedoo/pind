@@ -1,20 +1,20 @@
-import { useFormContext } from "react-hook-form";
-import { ErrorMessageForm } from "./styles";
+import { useFormContext } from 'react-hook-form'
+import { ErrorMessageForm } from './styles'
 
 interface ErrorMessageProps {
-  field: string;
+  field: string
 }
 
 export function ErrorMessage({ field }: ErrorMessageProps) {
-  const { formState:  { errors } } = useFormContext();
+  const {
+    formState: { errors },
+  } = useFormContext()
 
-  const fieldError = errors[field];
+  const fieldError = errors[field]
 
   if (!fieldError) {
-    return null;
+    return null
   }
 
-  return (
-    <ErrorMessageForm>{fieldError.message?.toString()}</ErrorMessageForm>
-  );
+  return <ErrorMessageForm>{fieldError.message?.toString()}</ErrorMessageForm>
 }

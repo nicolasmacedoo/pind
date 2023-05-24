@@ -13,14 +13,14 @@ export const Content = styled(Dialog.Content)`
   min-width: 32rem;
   border-radius: 6px;
   padding: 2.5rem 3rem;
-  background: ${props => props.theme.color['gray-600']};
-  color: ${props => props.theme.color.white};
+  background: ${(props) => props.theme.color['gray-600']};
+  color: ${(props) => props.theme.color.white};
 
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
+
   /* form {
     margin-top: 2rem;
 
@@ -31,20 +31,20 @@ export const Content = styled(Dialog.Content)`
     input {
       border-radius: 6px;
       border: 0;
-      background: ${props => props.theme.color['gray-700']};
-      color: ${props => props.theme.color['gray-300']};
+      background: ${(props) => props.theme.color['gray-700']};
+      color: ${(props) => props.theme.color['gray-300']};
       padding: 1rem;
 
       &::placeholder {
-        color: ${props => props.theme.color['gray-500']};
+        color: ${(props) => props.theme.color['gray-500']};
       }
     }
 
     button[type="submit"] {
       height: 58px;
       border: 0;
-      background: ${props => props.theme.color['green-700']};
-      color: ${props => props.theme.color.white};
+      background: ${(props) => props.theme.color['green-700']};
+      color: ${(props) => props.theme.color.white};
       font-weight: bold;
       padding: 0 1.25rem;
       border-radius: 6px;
@@ -52,7 +52,7 @@ export const Content = styled(Dialog.Content)`
       cursor: pointer;
 
       &:hover {
-        background: ${props => props.theme.color['green-500']};
+        background: ${(props) => props.theme.color['green-500']};
         transition: background-color 0.2s;
       }
     }
@@ -67,5 +67,5 @@ export const ClosedButton = styled(Dialog.Close)`
   right: 1.5rem;
   line-height: 0;
   cursor: pointer;
-  color:  ${props => props.theme.color['gray-500']};
+  color: ${(props) => props.theme.color['gray-500']};
 `

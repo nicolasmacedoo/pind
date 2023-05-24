@@ -1,8 +1,7 @@
-import styled from "styled-components"
+import styled from 'styled-components'
 
 export const HeaderContainer = styled.header`
   padding: 1.5rem 0 0.5rem;
-  
 `
 
 export const HeaderContent = styled.div`
@@ -10,10 +9,9 @@ export const HeaderContent = styled.div`
   max-width: 1576px;
   margin: 0 auto;
   padding: 0 1.5rem;
-  
-  
+
   h1 {
-    color: ${props => props.theme.color["gray-100"]};
+    color: ${(props) => props.theme.color['gray-100']};
   }
 `
 export const HeaderImage = styled.div`
@@ -29,24 +27,22 @@ export const HeaderTitle = styled.div`
   display: flex;
   /* flex-direction: column; */
   justify-content: space-between;
-  align-items: center; 
+  align-items: center;
   gap: 1rem;
-
-  
 `
 
 export const NewItemButton = styled.button`
   height: 50px;
   border: 0;
-  background: ${props => props.theme.color["green-700"]};
-  color: ${props => props.theme.color.white};
+  background: ${(props) => props.theme.color['green-700']};
+  color: ${(props) => props.theme.color.white};
   font-weight: bold;
   padding: 0 1.25rem;
   border-radius: 6px;
   cursor: pointer;
 
   &:hover {
-    background: ${props => props.theme.color["green-500"]};
+    background: ${(props) => props.theme.color['green-500']};
     transition: background-color 0.2s;
   }
 `

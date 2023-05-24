@@ -1,10 +1,10 @@
-import { Outlet } from "react-router-dom"
-import { SideBar } from "../components/SideBar/SideBar"
-import { Container, Content } from "./styles"
-import { useState } from "react";
+import { Outlet } from 'react-router-dom'
+import { SideBar } from '../components/SideBar/SideBar'
+import { Container, Content } from './styles'
+import { useState } from 'react'
 
 export function DefaultLayout() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <>

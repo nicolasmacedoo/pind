@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled, { css } from 'styled-components'
 
 export const SummaryContainer = styled.section`
   width: 100%;
@@ -9,7 +9,7 @@ export const SummaryContainer = styled.section`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  
+
   /* margin-top: -5rem; */
   margin-top: 2rem;
 `
@@ -19,16 +19,16 @@ interface SummaryCardProps {
 }
 
 export const SummaryCard = styled.div<SummaryCardProps>`
-  background-color: ${props => props.theme.color["gray-700"]};
+  background-color: ${(props) => props.theme.color['gray-700']};
   border-radius: 6px;
   padding: 2rem;
-  color: ${props => props.theme.color.white};
+  color: ${(props) => props.theme.color.white};
 
-  header{
+  header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: ${props => props.theme.color["gray-200"]};
+    color: ${(props) => props.theme.color['gray-200']};
   }
 
   strong {
@@ -37,6 +37,9 @@ export const SummaryCard = styled.div<SummaryCardProps>`
     font-size: 2rem;
   }
 
-  ${props => props.variant === 'green' && css`
-    background-color: ${props.theme.color["green-700"]};`}
+  ${(props) =>
+    props.variant === 'green' &&
+    css`
+      background-color: ${props.theme.color['green-700']};
+    `}
 `

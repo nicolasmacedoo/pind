@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const Container = styled.div`
   display: grid;
@@ -10,30 +10,29 @@ export const Container = styled.div`
 export const BgContent = styled.div`
   background: no-repeat center center;
   background-size: cover;
-  color: ${props => props.theme.color.white};
+  color: ${(props) => props.theme.color.white};
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 1rem;
   font-size: 2rem;
-  
+
   img {
     width: 30%;
   }
 
-  span{
+  span {
     font-size: 10rem;
   }
-  
 `
 
 export const FormContainer = styled.form`
-  display: flex; 
-  flex-direction: column; 
-  width: 100%; 
-  max-width: 20rem; 
-  gap: 1rem; 
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 20rem;
+  gap: 1rem;
   margin: 17rem auto;
 `
 

@@ -1,4 +1,4 @@
-import { Box } from "./styles";
+import { Box } from './styles'
 
 export function Home() {
   return (
@@ -18,5 +18,4 @@ export function Home() {
       <Box>Caixa</Box>
     </>
   )
-
 }

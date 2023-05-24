@@ -1,3 +1,3 @@
 export function Vendas() {
-  return <div>Vendas</div>;
+  return <div>Vendas</div>
 }
