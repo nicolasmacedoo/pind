@@ -8,8 +8,10 @@ export async function authenticate(
   reply: FastifyReply,
 ) {
   const authenticateBodySchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(6),
+    email: z.string(),
+    password: z.string(),
+    // email: z.string().email(),
+    // password: z.string().min(6),
   })
 
   const { email, password } = authenticateBodySchema.parse(request.body)
@@ -27,6 +29,7 @@ export async function authenticate(
       {
         sign: {
           sub: user.id,
+          expiresIn: '10m',
         },
       },
     )
@@ -41,17 +44,26 @@ export async function authenticate(
       },
     )
 
-    return reply
-      .setCookie('refreshToken', refreshToken, {
-        path: '/',
-        secure: true,
-        sameSite: true,
-        httpOnly: true,
-      })
-      .status(200)
-      .send({
-        token,
-      })
+    return reply.status(200).send({
+      token,
+      refreshToken,
+      user,
+    })
+
+    // return reply
+    //   .setCookie('refreshToken', refreshToken, {
+    //     path: '/',
+    //     secure: true,
+    //     sameSite: true,
+    //     httpOnly: true,
+    //   })
+    //   .status(200)
+    //   .send({
+    //     token,
+    //     // teste para o front
+    //     refreshToken,
+    //     user,
+    //   })
   } catch (err) {
     if (err instanceof InvalidCredentialsError) {
       return reply.status(400).send({

@@ -1,4 +1,4 @@
-import { ProdcutsRepository } from '@/repositories/products-repository'
+import { ProductsRepository } from '@/repositories/products-repository'
 import { Product } from '@prisma/client'
 
 interface CreateProductUseCaseRequest {
@@ -14,7 +14,7 @@ interface CreateProductUseCaseResponse {
 }
 
 export class CreateProductUseCase {
-  constructor(private productsRepository: ProdcutsRepository) {}
+  constructor(private productsRepository: ProductsRepository) {}
 
   async execute({
     name,
