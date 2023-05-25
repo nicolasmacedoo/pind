@@ -2,7 +2,7 @@ import { SuppliersRepository } from '@/repositories/supplier-repository'
 import { Supplier } from '@prisma/client'
 
 interface FetchSupplierUseCaseRequest {
-  supplierId: string
+  userId: string
 }
 
 interface FetchSupplierUseCaseResponse {
@@ -12,9 +12,9 @@ interface FetchSupplierUseCaseResponse {
 export class FetchSupplierUseCase {
   constructor(private supplierRepository: SuppliersRepository) {}
   async execute({
-    supplierId,
+    userId,
   }: FetchSupplierUseCaseRequest): Promise<FetchSupplierUseCaseResponse> {
-    const suppliers = await this.supplierRepository.fetchSuppliers(supplierId)
+    const suppliers = await this.supplierRepository.fetchSuppliers(userId)
 
     return {
       suppliers,

@@ -7,7 +7,7 @@ export async function fetch(request: FastifyRequest, reply: FastifyReply) {
   console.log(request.user.sub)
 
   const { suppliers } = await fetchSupplier.execute({
-    supplierId: request.user.sub,
+    userId: request.user.sub,
   })
 
   return reply.status(200).send(suppliers)

@@ -16,6 +16,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
   })
 
   const { id } = updateSupplierParamsSchema.parse(request.params)
+
   const { name, cnpj, phone } = updateSupplierBodySchema.parse(request.body)
 
   const updateSupplier = makeUpdateSupplierUseCase()
