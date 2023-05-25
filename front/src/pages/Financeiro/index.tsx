@@ -26,19 +26,26 @@ import { TransactionsContext } from '../../contexts/TransactionsContext'
 import { dateFormatter, priceFormatter } from '../../utils/formatter'
 import { NewItemModal } from '../../components/NewItemModal'
 
-export interface Transaction {
-  id: number
-  descricao: string
-  preco: number
-  categoria: string
+interface Transaction {
+  id: string
+  description: string
+  price: number
+  category: string
   type: 'income' | 'outcome'
-  data: string
+  date: Date
+}
+
+interface UpdateTransactionInput {
+  description?: string
+  price?: number
+  category?: string
+  type?: 'income' | 'outcome'
 }
 
 const newTransactionFormSchema = z.object({
-  descricao: z.string().nonempty('Descrição é obrigatária'),
-  preco: z.number(),
-  categoria: z.string(),
+  description: z.string().nonempty('Descrição é obrigatária'),
+  price: z.coerce.number(),
+  category: z.string(),
   type: z.enum(['income', 'outcome']),
 })
 
@@ -49,16 +56,14 @@ export function Financeiro() {
     transactions,
     createTransaction,
     deleteTransaction,
-    editTransaction,
+    updateTransaction,
   } = useContext(TransactionsContext)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null)
-  // const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  // useEffect(() => {
-  //   setTransactions(transactionList);
-  // }, [])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editTransaction, setEditTransaction] = useState<Transaction | null>(
+    null,
+  )
+  useState<Transaction | null>(null)
 
   const newTransactionForm = useForm<NewTransactionFormData>({
     resolver: zodResolver(newTransactionFormSchema),
@@ -67,33 +72,34 @@ export function Financeiro() {
   const { handleSubmit, reset, register, control, setValue } =
     newTransactionForm
 
-  function handleEditTransaction(transaction: Transaction) {
-    setSelectedTransaction(transaction)
+  function handleClearModal() {
+    reset()
+    setEditTransaction(null)
     setIsModalOpen(true)
-    setValue('descricao', transaction.descricao)
-    setValue('preco', transaction.preco)
-    setValue('categoria', transaction.categoria)
+  }
+
+  function handleEditTransaction(transaction: Transaction) {
+    setEditTransaction(transaction)
+
+    setValue('description', transaction.description)
+    setValue('price', transaction.price)
+    setValue('category', transaction.category)
     setValue('type', transaction.type)
+
+    setIsModalOpen(true)
   }
 
   function handleCreateTransaction(data: NewTransactionFormData) {
     createTransaction(data)
     console.log(data)
-    reset()
     setIsModalOpen(false)
   }
 
-  function handleUpdateTransaction(data: NewTransactionFormData) {
-    editTransaction(data, selectedTransaction)
-    reset()
-    setIsModalOpen(false)
-    setSelectedTransaction(null)
-  }
-
-  function handleClearModal() {
-    reset()
-    setSelectedTransaction(null)
-    setIsModalOpen(true)
+  function handleUpdateTransaction(data: UpdateTransactionInput) {
+    if (editTransaction) {
+      updateTransaction(editTransaction.id, data)
+      setIsModalOpen(false)
+    }
   }
 
   return (
@@ -101,7 +107,7 @@ export function Financeiro() {
     <>
       <Header
         title="Financeiro"
-        text={selectedTransaction ? 'Editar transação' : 'Nova transação'}
+        text="Nova transação"
         handleClearModal={handleClearModal}
       />
 
@@ -122,16 +128,17 @@ export function Financeiro() {
             {transactions?.map((transaction) => {
               return (
                 <Table.Row key={transaction.id}>
-                  <Table.Data>{transaction.descricao}</Table.Data>
+                  <Table.Data>{transaction.description}</Table.Data>
                   <Table.Data>
                     <PriceHighlight variant={transaction.type}>
                       {transaction.type === 'outcome' && '- '}
-                      {priceFormatter.format(transaction.preco)}
+                      {priceFormatter.format(transaction.price)}
                     </PriceHighlight>
                   </Table.Data>
-                  <Table.Data>{transaction.categoria}</Table.Data>
+                  <Table.Data>{transaction.category}</Table.Data>
                   <Table.Data>
-                    {dateFormatter.format(new Date(transaction.data))}
+                    {/* {dateFormatter.format(new Date(transaction.date))} */}
+                    {dateFormatter.format(transaction.date)}
                   </Table.Data>
                   <Table.Data>
                     <button
@@ -142,7 +149,7 @@ export function Financeiro() {
                     >
                       <PencilSimple size={24} weight="bold" />
                     </button>
-                    <button onClick={() => deleteTransaction(transaction)}>
+                    <button onClick={() => deleteTransaction(transaction.id)}>
                       <TrashSimple size={24} weight="bold" />
                     </button>
                   </Table.Data>
@@ -158,34 +165,34 @@ export function Financeiro() {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         handleClearModal={handleClearModal}
-        title={selectedTransaction ? 'Editar transação' : 'Nova transação'}
+        title={editTransaction ? 'Editar transação' : 'Nova transação'}
       >
         <FormProvider {...newTransactionForm}>
           <FormContainer
             onSubmit={
-              selectedTransaction
+              editTransaction
                 ? handleSubmit(handleUpdateTransaction)
                 : handleSubmit(handleCreateTransaction)
             }
           >
             <Form.Input
               type="text"
-              {...register('descricao')}
+              {...register('description')}
               placeholder="Descrição"
             />
-            <Form.ErrorMessage field="descricao" />
+            <Form.ErrorMessage field="description" />
             <Form.Input
               type="number"
-              {...register('preco', { valueAsNumber: true })}
+              {...register('price', { valueAsNumber: true })}
               placeholder="Preço"
             />
-            <Form.ErrorMessage field="preco" />
+            <Form.ErrorMessage field="price" />
             <Form.Input
               type="text"
-              {...register('categoria')}
+              {...register('category')}
               placeholder="Categoria"
             />
-            <Form.ErrorMessage field="categoria" />
+            <Form.ErrorMessage field="category" />
 
             <Controller
               control={control}
@@ -219,7 +226,7 @@ export function Financeiro() {
                 Cancelar
               </Form.Button>
               <Form.Button type="submit" variant="primary">
-                {selectedTransaction ? 'Salvar' : 'Cadastrar'}
+                {editTransaction ? 'Salvar' : 'Cadastrar'}
               </Form.Button>
             </ActionsContainer>
           </FormContainer>

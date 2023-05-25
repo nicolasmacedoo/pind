@@ -48,8 +48,8 @@ export function SupplierProvider({ children }: SupplierProviderProps) {
 
   async function createSupplier(data: CreateSupplierInput) {
     try {
-      await api.post('/suppliers', data)
-      fetchSuppliers()
+      const reponse = await api.post('/suppliers', data)
+      setSuppliers([...suppliers, reponse.data])
     } catch (err) {
       console.error('Erro ao criar fornecedor')
     }
@@ -57,8 +57,12 @@ export function SupplierProvider({ children }: SupplierProviderProps) {
 
   async function updateSupplier(id: string, data: UpdateSupplierInput) {
     try {
-      await api.put(`/suppliers/${id}`, data)
-      fetchSuppliers()
+      const response = await api.put(`/suppliers/${id}`, data)
+      setSuppliers(
+        suppliers.map((supplier) =>
+          supplier.id === id ? response.data : supplier,
+        ),
+      )
     } catch (err) {
       console.error('Erro ao atualizar fornecedor')
     }
@@ -67,7 +71,7 @@ export function SupplierProvider({ children }: SupplierProviderProps) {
   async function deleteSupplier(id: string) {
     try {
       await api.delete(`/suppliers/${id}`)
-      fetchSuppliers()
+      setSuppliers((state) => state.filter((state) => state.id !== id))
     } catch (err) {
       console.error('Erro ao deletar fornecedor')
     }

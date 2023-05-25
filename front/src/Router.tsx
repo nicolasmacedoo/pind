@@ -12,6 +12,8 @@ import { Vendas } from './pages/Vendas'
 import { Compras } from './pages/Compras'
 import { ProductsProvider } from './contexts/ProductsContext'
 import { ClientsProvider } from './contexts/ClientsContext'
+import { SupplierProvider } from './contexts/SuppliersContext'
+import { TransactionsProvider } from './contexts/TransactionsContext'
 
 export function Router() {
   return (
@@ -35,8 +37,22 @@ export function Router() {
             </ClientsProvider>
           }
         />
-        <Route path="/fornecedores" element={<Fornecedores />} />
-        <Route path="/financeiro" element={<Financeiro />} />
+        <Route
+          path="/fornecedores"
+          element={
+            <SupplierProvider>
+              <Fornecedores />
+            </SupplierProvider>
+          }
+        />
+        <Route
+          path="/financeiro"
+          element={
+            <TransactionsProvider>
+              <Financeiro />
+            </TransactionsProvider>
+          }
+        />
         <Route path="/vendas" element={<Vendas />} />
         <Route path="/compras" element={<Compras />} />
         <Route path="/dashboard" element={<Dashboard />} />

@@ -1,65 +1,34 @@
 import { ReactNode, createContext, useEffect, useState } from 'react'
+import { api } from '../services/api'
 
-export interface Transaction {
-  id: number
-  descricao: string
-  preco: number
-  categoria: string
+interface Transaction {
+  id: string
+  description: string
+  price: number
+  category: string
   type: 'income' | 'outcome'
-  data: string
+  date: Date
 }
 
-const transactionList: Transaction[] = [
-  {
-    id: 1,
-    descricao: 'Banana',
-    preco: 20,
-    categoria: 'Alimentação',
-    type: 'income',
-    data: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    descricao: 'Cadeira',
-    preco: 200,
-    categoria: 'Moveis',
-    type: 'outcome',
-    data: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    descricao: 'Mesa',
-    preco: 2300,
-    categoria: 'Moveis',
-    type: 'outcome',
-    data: new Date().toISOString(),
-  },
-  {
-    id: 4,
-    descricao: 'Laranja',
-    preco: 3000,
-    categoria: 'Alimentação',
-    type: 'income',
-    data: new Date().toISOString(),
-  },
-]
-
 interface CreateTransactionInput {
-  descricao: string
-  preco: number
-  categoria: string
+  description: string
+  price: number
+  category: string
   type: 'income' | 'outcome'
+}
+
+interface UpdateTransactionInput {
+  description?: string
+  price?: number
+  category?: string
+  type?: 'income' | 'outcome'
 }
 
 interface TransactionContextType {
   transactions: Transaction[]
-  createTransaction: (data: CreateTransactionInput) => void
-  editTransaction: (
-    data: CreateTransactionInput,
-    transaction: Transaction | null,
-  ) => void
-  deleteTransaction: (transaction: Transaction) => void
-  fetchTransactions: (query?: string) => Promise<void>
+  createTransaction: (data: CreateTransactionInput) => Promise<void>
+  updateTransaction: (id: string, data: UpdateTransactionInput) => Promise<void>
+  deleteTransaction: (id: string) => Promise<void>
 }
 
 interface TransactionProviderProps {
@@ -71,59 +40,43 @@ export const TransactionsContext = createContext({} as TransactionContextType)
 export function TransactionsProvider({ children }: TransactionProviderProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  async function fetchTransactions(query?: string) {
-    const url = new URL('http://localhost:3000/transactions')
-
-    if (query) {
-      url.searchParams.append('q', query)
-      const foundTransaction = transactions.filter((transaction) => {
-        return transaction.descricao.toLowerCase() === query.toLocaleLowerCase()
-      })
-
-      console.log(foundTransaction)
-
-      setTransactions(foundTransaction)
-    } else {
-      // const response = await fetch(url);
-      // const data = await response.json();
-
-      // setTransactions(data)
-      setTransactions(transactionList)
+  async function fetchTransactions() {
+    try {
+      const response = await api.get('/transactions')
+      console.log(response.data)
+      setTransactions(response.data)
+    } catch (err) {
+      console.error('Erro ao buscar as transações', err)
     }
   }
 
-  function createTransaction(data: CreateTransactionInput) {
-    setTransactions((state) => [
-      {
-        id: Math.floor(Math.random() * 1000),
-        data: new Date().toISOString(),
-        ...data,
-      },
-      ...state,
-    ])
+  async function createTransaction(data: CreateTransactionInput) {
+    try {
+      const response = await api.post('/transactions', data)
+      setTransactions((state) => [...state, response.data])
+    } catch (err) {
+      console.log('Erro ao criar a transação', err)
+    }
   }
 
-  function editTransaction(
-    data: CreateTransactionInput,
-    transaction: Transaction | null,
-  ) {
-    setTransactions((state) =>
-      state.map((state) =>
-        state.id === transaction?.id
-          ? {
-              id: transaction.id,
-              data: transaction.data,
-              ...data,
-            }
-          : state,
-      ),
-    )
+  async function updateTransaction(id: string, data: UpdateTransactionInput) {
+    try {
+      const response = await api.put(`/transactions/${id}`, data)
+      setTransactions((state) =>
+        state.map((state) => (state.id === id ? response.data : state)),
+      )
+    } catch (err) {
+      console.log('Erro ao atualizar a transação', err)
+    }
   }
 
-  function deleteTransaction(transaction: Transaction) {
-    setTransactions((state) =>
-      state.filter((state) => state.id !== transaction.id),
-    )
+  async function deleteTransaction(id: string) {
+    try {
+      await api.delete(`/transactions/${id}`)
+      setTransactions((state) => state.filter((state) => state.id !== id))
+    } catch (err) {
+      console.log('Erro ao deletar a transação', err)
+    }
   }
 
   useEffect(() => {
@@ -134,10 +87,9 @@ export function TransactionsProvider({ children }: TransactionProviderProps) {
     <TransactionsContext.Provider
       value={{
         transactions,
-        fetchTransactions,
         createTransaction,
         deleteTransaction,
-        editTransaction,
+        updateTransaction,
       }}
     >
       {children}

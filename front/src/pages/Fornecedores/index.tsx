@@ -10,111 +10,78 @@ import {
 } from './styles'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import { Table } from '../../components/Table'
 import { PencilSimple, TrashSimple } from 'phosphor-react'
 import { NewItemModal } from '../../components/NewItemModal'
+import { SuppliersContext } from '../../contexts/SuppliersContext'
 
-export interface Fornecedor {
-  id: number
-  nome: string
-  cpf: string
-  telefone: string
+interface Supplier {
+  id: string
+  user_id: string
+  name: string
+  cnpj: string
+  phone: string
+}
+interface UpdateSupplierInput {
+  id?: string
+  user_id?: string
+  name?: string
+  cnpj?: string
+  phone?: string
 }
 
-const fornecedoresList: Fornecedor[] = [
-  {
-    id: 1,
-    nome: 'Fornecedor 1',
-    cpf: '111.111.111-11',
-    telefone: '(99) 11111-1111',
-  },
-  {
-    id: 2,
-    nome: 'Fornecedor 2',
-    cpf: '222.222.222-22',
-    telefone: '(99) 22222-2222',
-  },
-  {
-    id: 3,
-    nome: 'Fornecedor 3',
-    cpf: '333.333.333-33',
-    telefone: '(99) 33333-3333',
-  },
-  {
-    id: 4,
-    nome: 'Fornecedor 4',
-    cpf: '444.444.444-44',
-    telefone: '(99) 44444-4444',
-  },
-]
-
-const newFornecedorFormSchema = z.object({
-  nome: z.string().nonempty('Nome é obrigatário'),
-  cpf: z.string(),
-  telefone: z.string(),
+const newSupplierFormSchema = z.object({
+  name: z.string().nonempty('Nome é obrigatário'),
+  cnpj: z.string(),
+  phone: z.string(),
 })
 
-type NewFornecedorFormData = z.infer<typeof newFornecedorFormSchema>
+type NewSupplierFormData = z.infer<typeof newSupplierFormSchema>
 
 export function Fornecedores() {
+  const { suppliers, createSupplier, deleteSupplier, updateSupplier } =
+    useContext(SuppliersContext)
+
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
-  const [editFornecedor, setEditFornecedor] = useState<Fornecedor | null>(null)
+  const [editSupplier, setEditSupplier] = useState<Supplier | null>(null)
 
-  useEffect(() => {
-    setFornecedores(fornecedoresList)
-  }, [])
-
-  const newFornecedorForm = useForm<NewFornecedorFormData>({
-    resolver: zodResolver(newFornecedorFormSchema),
+  const newSupplierForm = useForm<NewSupplierFormData>({
+    resolver: zodResolver(newSupplierFormSchema),
   })
 
-  const { handleSubmit, reset, register, setValue } = newFornecedorForm
+  const { handleSubmit, reset, register, setValue } = newSupplierForm
 
   function handleClearModal() {
     reset()
-    setEditFornecedor(null)
+    setEditSupplier(null)
     setIsModalOpen(true)
   }
 
-  function handleCreateFornecedor(data: NewFornecedorFormData) {
-    setFornecedores((state) => [
-      ...state,
-      {
-        id: Math.floor(Math.random() * 1000),
-        ...data,
-      },
-    ])
+  function handleEditSupplier(supplier: Supplier) {
+    setEditSupplier(supplier)
 
-    setIsModalOpen(false)
-  }
-
-  function handleEditFornecedor(fornecedor: Fornecedor) {
-    setEditFornecedor(fornecedor)
-
-    setValue('nome', fornecedor.nome)
-    setValue('cpf', fornecedor.cpf)
-    setValue('telefone', fornecedor.telefone)
+    setValue('name', supplier.name)
+    setValue('cnpj', supplier.cnpj)
+    setValue('phone', supplier.phone)
 
     setIsModalOpen(true)
   }
 
-  function handleUpdateFornecedor(data: NewFornecedorFormData) {
-    setFornecedores((state) =>
-      state.map((fornecedor) =>
-        fornecedor.id === editFornecedor?.id
-          ? { ...fornecedor, ...data }
-          : fornecedor,
-      ),
-    )
+  function handleCreateSupplier(data: NewSupplierFormData) {
+    createSupplier(data)
     setIsModalOpen(false)
   }
 
-  function handleDeleteFornecedor(fornecedor: Fornecedor) {
-    setFornecedores((state) =>
-      state.filter((fornecedorState) => fornecedorState.id !== fornecedor.id),
-    )
+  function handleUpdateSupplier(data: UpdateSupplierInput) {
+    if (editSupplier) {
+      updateSupplier(editSupplier.id, data)
+      setIsModalOpen(false)
+    }
+  }
+
+  function handleDeleteSupplier(id: string) {
+    deleteSupplier(id)
   }
 
   return (
@@ -137,17 +104,17 @@ export function Fornecedores() {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {fornecedores.map((fornecedor) => {
+            {suppliers.map((supplier) => {
               return (
-                <Table.Row key={fornecedor.id}>
-                  <Table.Data>{fornecedor.nome}</Table.Data>
-                  <Table.Data>{fornecedor.cpf}</Table.Data>
-                  <Table.Data>{fornecedor.telefone}</Table.Data>
+                <Table.Row key={supplier.id}>
+                  <Table.Data>{supplier.name}</Table.Data>
+                  <Table.Data>{supplier.cnpj}</Table.Data>
+                  <Table.Data>{supplier.phone}</Table.Data>
                   <Table.Data>
-                    <button onClick={() => handleEditFornecedor(fornecedor)}>
+                    <button onClick={() => handleEditSupplier(supplier)}>
                       <PencilSimple size={24} weight="bold" />
                     </button>
-                    <button onClick={() => handleDeleteFornecedor(fornecedor)}>
+                    <button onClick={() => handleDeleteSupplier(supplier.id)}>
                       <TrashSimple size={24} weight="bold" />
                     </button>
                   </Table.Data>
@@ -163,26 +130,26 @@ export function Fornecedores() {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         handleClearModal={handleClearModal}
-        title={editFornecedor ? 'Editar Fornecedor' : 'Novo Fornecedor'}
+        title={editSupplier ? 'Editar Fornecedor' : 'Novo Fornecedor'}
       >
-        <FormProvider {...newFornecedorForm}>
+        <FormProvider {...newSupplierForm}>
           <FormContainer
             onSubmit={
-              editFornecedor
-                ? handleSubmit(handleUpdateFornecedor)
-                : handleSubmit(handleCreateFornecedor)
+              editSupplier
+                ? handleSubmit(handleUpdateSupplier)
+                : handleSubmit(handleCreateSupplier)
             }
           >
-            <Form.Input type="text" {...register('nome')} placeholder="Nome" />
-            <Form.ErrorMessage field="nome" />
-            <Form.Input type="text" {...register('cpf')} placeholder="CPF" />
-            <Form.ErrorMessage field="cpf" />
+            <Form.Input type="text" {...register('name')} placeholder="Nome" />
+            <Form.ErrorMessage field="name" />
+            <Form.Input type="text" {...register('cnpj')} placeholder="CPF" />
+            <Form.ErrorMessage field="cnpj" />
             <Form.Input
               type="text "
-              {...register('telefone')}
+              {...register('phone')}
               placeholder="Telefone"
             />
-            <Form.ErrorMessage field="cpf" />
+            <Form.ErrorMessage field="phone" />
 
             <ActionsContainer>
               <Form.Button
@@ -193,7 +160,7 @@ export function Fornecedores() {
                 Cancelar
               </Form.Button>
               <Form.Button type="submit" variant="primary">
-                {editFornecedor ? 'Salvar' : 'Cadastrar'}
+                {editSupplier ? 'Salvar' : 'Cadastrar'}
               </Form.Button>
             </ActionsContainer>
           </FormContainer>
