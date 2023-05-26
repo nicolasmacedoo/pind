@@ -31,5 +31,10 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     },
   })
 
-  return reply.status(200).send(transaction)
+  const transformedTransaction = {
+    ...transaction,
+    price: transaction.price.toNumber(),
+  }
+
+  return reply.status(200).send(transformedTransaction)
 }

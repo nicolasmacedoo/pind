@@ -10,5 +10,10 @@ export async function fetch(request: FastifyRequest, reply: FastifyReply) {
     userId: request.user.sub,
   })
 
-  return reply.status(200).send(transactions)
+  const transformedTransactions = transactions.map((transaction) => ({
+    ...transaction,
+    price: transaction.price.toNumber(),
+  }))
+
+  return reply.status(200).send(transformedTransactions)
 }

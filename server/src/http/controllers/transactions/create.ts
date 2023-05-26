@@ -5,7 +5,7 @@ import { z } from 'zod'
 export async function create(request: FastifyRequest, reply: FastifyReply) {
   const createTransactionBodySchema = z.object({
     description: z.string(),
-    price: z.number(),
+    price: z.coerce.number(),
     category: z.string(),
     type: z.enum(['income', 'outcome']),
   })
@@ -23,5 +23,12 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     userId: request.user.sub,
   })
 
-  return reply.status(201).send(transaction)
+  const transformedTransaction = {
+    ...transaction,
+    price: transaction.price.toNumber(),
+  }
+
+  console.log(transformedTransaction)
+
+  return reply.status(201).send(transformedTransaction)
 }
