@@ -15,5 +15,7 @@ export async function fetch(request: FastifyRequest, reply: FastifyReply) {
     price: transaction.price.toNumber(),
   }))
 
+  console.log(transformedTransactions)
+
   return reply.status(200).send(transformedTransactions)
 }

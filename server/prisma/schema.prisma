@@ -13,8 +13,8 @@ model User {
   email         String        @unique
   password_hash String
   created_at    DateTime      @default(now())
-  products      Product[]
   clients       Client[]
+  products      Product[]
   suppliers     Supplier[]
   transactions  Transaction[]
 
@@ -23,13 +23,12 @@ model User {
 
 model Product {
   id               String  @id @default(uuid())
-  user_id          String
   name             String
   price            Decimal @db.Money
   quantity         Decimal @db.Decimal(6, 2)
   unit_measurement String
-
-  user User @relation(fields: [user_id], references: [id])
+  user_id          String
+  user             User    @relation(fields: [user_id], references: [id])
 
   @@map("products")
 }
@@ -40,8 +39,7 @@ model Client {
   name    String
   cpf     String @unique
   phone   String
-
-  user User @relation(fields: [user_id], references: [id])
+  user    User   @relation(fields: [user_id], references: [id])
 
   @@map("clients")
 }
@@ -52,8 +50,7 @@ model Supplier {
   name    String
   cnpj    String @unique
   phone   String
-
-  user User @relation(fields: [user_id], references: [id])
+  user    User   @relation(fields: [user_id], references: [id])
 
   @@map("suppliers")
 }
@@ -66,8 +63,7 @@ model Transaction {
   category    String
   type        String
   created_at  DateTime @default(now())
-
-  user User @relation(fields: [user_id], references: [id])
+  user        User     @relation(fields: [user_id], references: [id])
 
   @@map("transactions")
 }
