@@ -14,11 +14,14 @@ import { ProductsProvider } from './contexts/ProductsContext'
 import { ClientsProvider } from './contexts/ClientsContext'
 import { SupplierProvider } from './contexts/SuppliersContext'
 import { TransactionsProvider } from './contexts/TransactionsContext'
+import { Cadastro } from './pages/Cadastro'
 
 export function Router() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/cadastro" element={<Cadastro />} />
+
       <Route path="/" element={<DefaultLayout />}>
         <Route path="/home" element={<Home />} />
         <Route
@@ -53,7 +56,16 @@ export function Router() {
             </TransactionsProvider>
           }
         />
-        <Route path="/vendas" element={<Vendas />} />
+        <Route
+          path="/vendas"
+          element={
+            <ClientsProvider>
+              <ProductsProvider>
+                <Vendas />
+              </ProductsProvider>
+            </ClientsProvider>
+          }
+        />
         <Route path="/compras" element={<Compras />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/metrics" element={<Metrics />} />

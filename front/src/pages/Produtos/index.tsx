@@ -108,7 +108,7 @@ export function Produtos() {
     <>
       <Header
         title="Produtos"
-        text="Adicionar produto"
+        text="Novo produto"
         handleClearModal={handleClearModal}
       />
       <ItemContainer>

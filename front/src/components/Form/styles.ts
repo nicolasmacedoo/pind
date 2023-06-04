@@ -2,10 +2,11 @@ import styled from 'styled-components'
 
 export const LabelForm = styled.label`
   display: flex;
-  font-size: 0.875rem;
+  font-size: 1.1rem;
   line-height: 1.25rem;
   justify-content: space-between;
   align-items: center;
+  color: ${(props) => props.theme.color['gray-300']};
 `
 
 export const InputForm = styled.input`
@@ -45,6 +46,7 @@ export const ButtonForm = styled.button<ActionsButtonProps>`
       : props.theme.color['green-700']};
   color: ${(props) => props.theme.color.white};
   font-weight: bold;
+  font-size: 1.2rem;
   padding: 0 1.25rem;
   border-radius: 6px;
   margin-top: 1.5rem;

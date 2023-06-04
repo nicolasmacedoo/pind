@@ -42,7 +42,7 @@ api.interceptors.response.use(
 
       if (!isRefreshing) {
         isRefreshing = true
-        console.log('cehgou', cookies['pind.refreshToken'])
+        // console.log('cehgou', cookies['pind.refreshToken'])
 
         api
           .patch<RefreshTokenResponse>(

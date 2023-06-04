@@ -50,7 +50,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
           navigate('/')
         })
-    } else navigate('/')
+    } else {
+      if (window.location.pathname === '/cadastro') return
+
+      navigate('/')
+    }
   }, [navigate])
 
   async function signIn({ email, password }: SignInCredentials) {

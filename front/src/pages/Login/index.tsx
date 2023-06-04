@@ -8,6 +8,7 @@ import { BgContent, Container, ErrorSpan, FormContainer } from './styles'
 
 import bg from '../../assets/plantacao.jpg'
 import logo from '../../assets/logo.svg'
+import { Link } from 'react-router-dom'
 
 const signInFormSchema = z.object({
   email: z.string().nonempty('O e-mail é obrigatário'),
@@ -57,7 +58,13 @@ export function Login() {
 
           {errorMessage && <ErrorSpan>{errorMessage}</ErrorSpan>}
 
-          <Form.Button type="submit">Entrar</Form.Button>
+          <p id="cadastrar">
+            Ainda não tem uma conta? <Link to="/cadastro">Cadastre-se</Link>
+          </p>
+
+          <Form.Button type="submit" variant="primary">
+            Entrar
+          </Form.Button>
         </FormContainer>
       </FormProvider>
     </Container>

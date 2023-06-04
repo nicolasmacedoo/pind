@@ -91,7 +91,6 @@ export function Financeiro() {
 
   function handleCreateTransaction(data: NewTransactionFormData) {
     createTransaction(data)
-    console.log(data)
     setIsModalOpen(false)
   }
 
@@ -103,7 +102,6 @@ export function Financeiro() {
   }
 
   return (
-    // colocar provider no app?
     <>
       <Header
         title="Financeiro"
@@ -137,7 +135,6 @@ export function Financeiro() {
                   </Table.Data>
                   <Table.Data>{transaction.category}</Table.Data>
                   <Table.Data>
-                    {/* {dateFormatter.format(new Date(transaction.date))} */}
                     {dateFormatter.format(transaction.date)}
                   </Table.Data>
                   <Table.Data>

@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useEffect, useState } from 'react'
 import { api } from '../services/api'
+import { AxiosResponse } from 'axios'
 
 interface Transaction {
   id: string
@@ -42,7 +43,9 @@ export function TransactionsProvider({ children }: TransactionProviderProps) {
 
   async function fetchTransactions() {
     try {
-      const response = await api.get('/transactions')
+      const response: AxiosResponse<Transaction[]> = await api.get(
+        '/transactions',
+      )
       console.log(response.data)
       setTransactions(response.data)
     } catch (err) {
@@ -52,7 +55,10 @@ export function TransactionsProvider({ children }: TransactionProviderProps) {
 
   async function createTransaction(data: CreateTransactionInput) {
     try {
-      const response = await api.post('/transactions', data)
+      const response: AxiosResponse<Transaction> = await api.post(
+        '/transactions',
+        data,
+      )
       setTransactions((state) => [...state, response.data])
     } catch (err) {
       console.log('Erro ao criar a transação', err)
@@ -62,6 +68,7 @@ export function TransactionsProvider({ children }: TransactionProviderProps) {
   async function updateTransaction(id: string, data: UpdateTransactionInput) {
     try {
       const response = await api.put(`/transactions/${id}`, data)
+      console.log(response.data)
       setTransactions((state) =>
         state.map((state) => (state.id === id ? response.data : state)),
       )

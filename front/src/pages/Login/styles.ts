@@ -34,6 +34,19 @@ export const FormContainer = styled.form`
   max-width: 20rem;
   gap: 1rem;
   margin: 17rem auto;
+
+  #cadastrar {
+    color: ${(props) => props.theme.color['gray-300']};
+  }
+
+  a {
+    text-decoration: none;
+    color: ${(props) => props.theme.color['green-500']};
+  }
+
+  a:hover {
+    color: ${(props) => props.theme.color['green-300']};
+  }
 `
 
 export const ErrorSpan = styled.span`
