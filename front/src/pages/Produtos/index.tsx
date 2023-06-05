@@ -16,6 +16,7 @@ import { PencilSimple, TrashSimple } from 'phosphor-react'
 import { priceFormatter, quantityFormatter } from '../../utils/formatter'
 import { NewItemModal } from '../../components/NewItemModal'
 import { ProductsContext } from '../../contexts/ProductsContext'
+import { AlertDialogDelete } from '../../components/AlertDialog'
 
 interface Product {
   id: string
@@ -66,7 +67,7 @@ export function Produtos() {
 
   function handleClearModal() {
     reset()
-    // //setEditProduct(null) comentado
+    setEditProduct(null)
     setIsModalOpen(true)
     console.log('limpou')
   }
@@ -139,9 +140,17 @@ export function Produtos() {
                     <button onClick={() => handleEditProduct(product)}>
                       <PencilSimple size={24} weight="bold" />
                     </button>
-                    <button onClick={() => handleDeleteProduct(product.id)}>
+                    {/* <button onClick={() => handleDeleteProduct(product.id)}>
                       <TrashSimple size={24} weight="bold" />
-                    </button>
+                    </button> */}
+                    <AlertDialogDelete
+                      itemId={product.id}
+                      handleDelete={handleDeleteProduct}
+                    >
+                      <button>
+                        <TrashSimple size={24} weight="bold" />
+                      </button>
+                    </AlertDialogDelete>
                   </Table.Data>
                 </Table.Row>
               )

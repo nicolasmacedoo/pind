@@ -29,6 +29,7 @@ import {
 } from '../../utils/formatter'
 import { getAdressByCep } from '../../services/get-address'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const newUserFormSchema = z.object({
   name: z.string().min(1, 'Preencha o nome'),
@@ -41,7 +42,7 @@ const newUserFormSchema = z.object({
   cep: z.string(),
   street: z.string(),
   neighborhood: z.string(),
-  number: z.string(),
+  number: z.coerce.number(),
   complement: z.string(),
   state: z.string(),
   city: z.string(),
@@ -53,6 +54,7 @@ type NewUserFormData = z.infer<typeof newUserFormSchema>
 
 export function Cadastro() {
   const [cepError, setCepError] = useState(false)
+  const navigate = useNavigate()
 
   const newUserForm = useForm<NewUserFormData>({
     resolver: zodResolver(newUserFormSchema),
@@ -65,6 +67,8 @@ export function Cadastro() {
     console.log(data)
     console.log('Cadastrado')
     reset()
+
+    navigate('/')
   }
 
   return (

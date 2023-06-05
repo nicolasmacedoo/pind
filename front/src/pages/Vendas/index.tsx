@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Header } from '../../components/Header'
 import { NewItemModal } from '../../components/NewItemModal'
 import { z } from 'zod'
@@ -9,15 +9,20 @@ import {
   AddButton,
   FieldsContainer,
   FormContainer,
+  ItemContainer,
   RemoveButton,
   SelectField,
   SpanError,
+  TableContent,
 } from './styles'
 import { Form } from '../../components/Form'
 import { Trash } from 'phosphor-react'
 import { ClientsContext } from '../../contexts/ClientsContext'
 import { ProductsContext } from '../../contexts/ProductsContext'
-import axios from 'axios'
+import { api } from '../../services/api'
+import { SearchForm } from '../../components/SearchForm'
+import { Table } from '../../components/Table'
+import { dateFormatter, priceFormatter } from '../../utils/formatter'
 
 const newOrderFormSchema = z.object({
   client: z.string().nonempty({ message: 'Campo obrigatório' }),
@@ -34,10 +39,21 @@ const newOrderFormSchema = z.object({
 
 type NewOrderFormData = z.infer<typeof newOrderFormSchema>
 
+interface Orders {
+  id: string
+  total: number
+  date: Date
+  client: {
+    name: string
+    cpf: string
+  }
+}
+
 export function Vendas() {
   const { clients } = useContext(ClientsContext)
   const { products } = useContext(ProductsContext)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [orders, setOrders] = useState<Orders[]>([])
 
   const newOrderForm = useForm<NewOrderFormData>({
     resolver: zodResolver(newOrderFormSchema),
@@ -79,9 +95,15 @@ export function Vendas() {
       return 0
     }, 0)
 
-    console.log(total)
+    const order = {
+      clientId: data.client,
+      total,
+      products: data.products,
+    }
 
-    axios.post('http://localhost:3000/order', data).then((response) => {
+    console.log(order)
+
+    api.post('/orders', order).then((response) => {
       console.log(response.data)
     })
 
@@ -90,6 +112,23 @@ export function Vendas() {
     remove(fields.length - 1)
   }
 
+  async function fetchOrders() {
+    await api.get<Orders[]>('/orders').then((response) => {
+      const formatedData = response.data.map((order) => {
+        return {
+          ...order,
+          date: new Date(order.date),
+        }
+      })
+      console.log(formatedData)
+      setOrders(formatedData)
+    })
+  }
+
+  useEffect(() => {
+    fetchOrders()
+  }, [])
+
   return (
     <>
       <Header
@@ -97,6 +136,31 @@ export function Vendas() {
         text="Nova Venda"
         handleClearModal={handleClearModal}
       />
+      <ItemContainer>
+        <SearchForm text="Busque por pedidos" />
+        <TableContent>
+          <Table.Header>
+            <Table.Row>
+              <Table.Head>Nome</Table.Head>
+              <Table.Head>CPF</Table.Head>
+              <Table.Head>Total</Table.Head>
+              <Table.Head>Data</Table.Head>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {orders.map((order) => {
+              return (
+                <Table.Row key={order.id}>
+                  <Table.Data>{order.client.name}</Table.Data>
+                  <Table.Data>{order.client.cpf}</Table.Data>
+                  <Table.Data>{priceFormatter.format(order.total)}</Table.Data>
+                  <Table.Data>{dateFormatter.format(order.date)}</Table.Data>
+                </Table.Row>
+              )
+            })}
+          </Table.Body>
+        </TableContent>
+      </ItemContainer>
 
       {/* MODAL */}
       <NewItemModal
@@ -113,7 +177,7 @@ export function Vendas() {
                 <option value="">Selecione ...</option>
                 {clients.map((client) => {
                   return (
-                    <option key={client.id} value={client.name}>
+                    <option key={client.id} value={client.id}>
                       {client.name}
                     </option>
                   )
