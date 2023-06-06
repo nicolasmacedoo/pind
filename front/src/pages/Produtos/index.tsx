@@ -10,13 +10,14 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { Form } from '../../components/Form'
-import { useContext, useState } from 'react'
+import { SyntheticEvent, useContext, useState } from 'react'
 import { Table } from '../../components/Table'
 import { PencilSimple, TrashSimple } from 'phosphor-react'
 import { priceFormatter, quantityFormatter } from '../../utils/formatter'
 import { NewItemModal } from '../../components/NewItemModal'
 import { ProductsContext } from '../../contexts/ProductsContext'
 import { AlertDialogDelete } from '../../components/AlertDialog'
+import SimpleSnackbar from '../../components/SnackBar'
 
 interface Product {
   id: string
@@ -55,9 +56,14 @@ export function Produtos() {
   const { products, createProduct, updateProduct, deleteProduct } =
     useContext(ProductsContext)
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [editProduct, setEditProduct] = useState<Product | null>(null)
   // const [editProduct, setEditProduct] = useState<Product>({} as Product);
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isToastOpen, setIsToastOpen] = useState(false)
+  const [typeToast, setTypeToast] = useState<'success' | 'error' | 'warning'>(
+    'success',
+  )
+  const [messageToast, setMessageToast] = useState('')
 
   const newProductForm = useForm<NewProductFormData>({
     resolver: zodResolver(newProductFormSchema),
@@ -72,6 +78,18 @@ export function Produtos() {
     console.log('limpou')
   }
 
+  function handleToastOpen() {
+    setIsToastOpen(true)
+  }
+
+  function handleClose(_event: SyntheticEvent | Event, reason?: string) {
+    if (reason === 'clickaway') {
+      return
+    }
+
+    setIsToastOpen(false)
+  }
+
   function handleEditProduct(product: Product) {
     console.log(product)
     setEditProduct(product)
@@ -83,10 +101,19 @@ export function Produtos() {
     setIsModalOpen(true)
   }
 
-  function handleCreateProduct(data: NewProductFormData) {
-    createProduct(data)
+  async function handleCreateProduct(data: NewProductFormData) {
+    const success = await createProduct(data)
+    if (success) {
+      setTypeToast('success')
+      setMessageToast('Produto criado com sucesso!')
+    } else {
+      setTypeToast('error')
+      setMessageToast('Erro ao criar o produto!')
+    }
+
     // setEditProduct(null)
     setIsModalOpen(false)
+    setIsToastOpen(true)
   }
 
   function handleUpdateProduct(data: UpdateProductInput) {
@@ -98,11 +125,19 @@ export function Produtos() {
     }
   }
 
-  function handleDeleteProduct(id: string) {
-    deleteProduct(id)
+  async function handleDeleteProduct(id: string) {
+    const success = await deleteProduct(id)
+    if (success !== 'success') {
+      setTypeToast('warning')
+      setMessageToast(success)
+    } else {
+      setTypeToast('success')
+      setMessageToast('Produto deletado com sucesso!')
+    }
 
     // setEditProduct(null)
     setIsModalOpen(false)
+    setIsToastOpen(true)
   }
 
   return (
@@ -159,6 +194,16 @@ export function Produtos() {
         </TableContent>
       </ItemContainer>
 
+      {/* SNACKBAR */}
+      <button onClick={handleToastOpen}>Open simple snackbar</button>
+      {/* <SimpleSnackbar isToastOpen={isToastOpen} handleClose={handleClose} /> */}
+      <SimpleSnackbar
+        isToastOpen={isToastOpen}
+        handleClose={handleClose}
+        type={typeToast}
+        message={messageToast}
+      />
+
       {/* MODAL */}
       <NewItemModal
         isModalOpen={isModalOpen}
@@ -207,6 +252,7 @@ export function Produtos() {
               >
                 Cancelar
               </Form.Button>
+
               <Form.Button type="submit" variant="primary">
                 {editProduct ? 'Salvar' : 'Cadastrar'}
               </Form.Button>

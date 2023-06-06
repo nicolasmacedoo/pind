@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useEffect, useState } from 'react'
 import { api } from '../services/api'
+import axios from 'axios'
 
 interface Product {
   id: string
@@ -26,9 +27,9 @@ interface UpdateProductInput {
 
 interface ProductsContextType {
   products: Product[]
-  createProduct: (data: CreateProductInput) => Promise<void>
+  createProduct: (data: CreateProductInput) => Promise<boolean>
   updateProduct: (id: string, data: UpdateProductInput) => Promise<void>
-  deleteProduct: (id: string) => Promise<void>
+  deleteProduct: (id: string) => Promise<string>
 }
 
 interface ProductsProviderProps {
@@ -49,9 +50,20 @@ export function ProductsProvider({ children }: ProductsProviderProps) {
     }
   }
 
-  async function createProduct(data: CreateProductInput) {
-    const response = await api.post('/products', data)
-    setProducts([...products, response.data])
+  async function createProduct(data: CreateProductInput): Promise<boolean> {
+    // const response = await api.post('/productss', data)
+    // setProducts([...products, response.data])
+    try {
+      const response = await api.post('/products', data)
+      setProducts([...products, response.data])
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.status)
+        console.log('ERORRR')
+        return false
+      }
+    }
+    return true
   }
 
   async function updateProduct(id: string, data: UpdateProductInput) {
@@ -63,10 +75,19 @@ export function ProductsProvider({ children }: ProductsProviderProps) {
     setProducts(updatedProducts)
   }
 
-  async function deleteProduct(id: string) {
-    await api.delete(`/products/${id}`)
-    const updatedProducts = products.filter((product) => product.id !== id)
-    setProducts(updatedProducts)
+  async function deleteProduct(id: string): Promise<string> {
+    try {
+      await api.delete(`/products/${id}`)
+      const updatedProducts = products.filter((product) => product.id !== id)
+      setProducts(updatedProducts)
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.response)
+        return error.response?.data.message
+      }
+    }
+
+    return 'success'
   }
 
   useEffect(() => {
