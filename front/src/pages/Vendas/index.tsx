@@ -2,7 +2,12 @@ import { useContext, useEffect, useState } from 'react'
 import { Header } from '../../components/Header'
 import { NewItemModal } from '../../components/NewItemModal'
 import { z } from 'zod'
-import { FormProvider, useForm, useFieldArray } from 'react-hook-form'
+import {
+  FormProvider,
+  useForm,
+  useFieldArray,
+  Controller,
+} from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   ActionsContainer,
@@ -23,14 +28,24 @@ import { api } from '../../services/api'
 import { SearchForm } from '../../components/SearchForm'
 import { Table } from '../../components/Table'
 import { dateFormatter, priceFormatter } from '../../utils/formatter'
+import {
+  Autocomplete,
+  TextField,
+  ThemeProvider,
+  createTheme,
+} from '@mui/material'
 
 const newOrderFormSchema = z.object({
-  client: z.string().nonempty({ message: 'Campo obrigatório' }),
+  client: z
+    .string({
+      required_error: 'Selecione um cliente',
+    })
+    .nonempty({ message: 'Campo obrigatório' }),
   products: z
     .array(
       z.object({
         // name: z.string().nonempty({ message: 'Campo obrigatório' }),
-        id: z.string().nonempty({ message: 'Campo obrigatório' }),
+        id: z.string().nonempty({ message: 'Selecione um produto' }),
         quantity: z.coerce.number().min(1, 'Quantidade mínima é 1'),
       }),
     )
@@ -98,7 +113,10 @@ export function Vendas() {
     const order = {
       clientId: data.client,
       total,
-      products: data.products,
+      products: data.products.map((product) => ({
+        id: product.id,
+        quantity: product.quantity,
+      })),
     }
 
     console.log(order)
@@ -124,6 +142,26 @@ export function Vendas() {
       setOrders(formatedData)
     })
   }
+
+  const options = clients.map((client) => {
+    return {
+      value: client.id,
+      label: client.name,
+    }
+  })
+
+  const theme = createTheme({
+    components: {
+      MuiAutocomplete: {
+        styleOverrides: {
+          paper: {
+            background: '#323238',
+            color: '#7C7C8A',
+          },
+        },
+      },
+    },
+  })
 
   useEffect(() => {
     fetchOrders()
@@ -171,8 +209,9 @@ export function Vendas() {
       >
         <FormProvider {...newOrderForm}>
           <FormContainer onSubmit={handleSubmit(handleCreateOrder)}>
-            <Form.Field>
-              <Form.Label>Cliente</Form.Label>
+            <ThemeProvider theme={theme}>
+              <Form.Field>
+                {/* <Form.Label>Cliente</Form.Label>
               <SelectField {...register('client')}>
                 <option value="">Selecione ...</option>
                 {clients.map((client) => {
@@ -183,72 +222,184 @@ export function Vendas() {
                   )
                 })}
               </SelectField>
-              <Form.ErrorMessage field="client" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label>
-                Produtos
-                <AddButton type="button" onClick={addNewProduct}>
-                  Adicionar
-                </AddButton>
-              </Form.Label>
-              {fields.map((field, index) => {
-                return (
-                  <FieldsContainer key={field.id}>
-                    <Form.Field>
-                      <SelectField {...register(`products.${index}.id`)}>
-                        <option value="">Selecione ...</option>
-                        {products.map((product) => {
-                          return (
-                            <option key={product.id} value={product.id}>
-                              {product.name}
-                            </option>
-                          )
-                        })}
-                      </SelectField>
-                      <SpanError>
-                        {errors.products?.[index]?.id?.message}
-                      </SpanError>
-                    </Form.Field>
-
-                    <Form.Field>
-                      <Form.Input
-                        type="number"
-                        placeholder="Quantidade"
-                        {...register(`products.${index}.quantity`)}
+              <Form.ErrorMessage field="client" /> */}
+                <Controller
+                  name="client"
+                  control={control}
+                  render={({ field }) => {
+                    const { onChange, value } = field
+                    return (
+                      <Autocomplete
+                        value={
+                          value
+                            ? options.find(
+                                (option) => value === option.value,
+                              ) ?? null
+                            : null
+                        }
+                        getOptionLabel={(option) => option.label}
+                        onChange={(_, newValue) => {
+                          onChange(newValue ? newValue.value : null)
+                        }}
+                        options={options}
+                        id="combo-box-demo"
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Clientes"
+                            error={!!errors.client}
+                            helperText={errors.client?.message}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                  borderColor: '#7C7C8A',
+                                },
+                                '&:hover fieldset': {
+                                  borderColor: '#323238',
+                                },
+                                '&.Mui-focused fieldset': {
+                                  borderColor: '#015F43',
+                                },
+                                '& input': {
+                                  color: '#7C7C8A',
+                                },
+                              },
+                              '& label.Mui-focused': {
+                                color: '#7C7C8A',
+                              },
+                              '& label': {
+                                color: '#7C7C8A',
+                              },
+                            }}
+                          />
+                        )}
                       />
-                      {errors.products?.[index]?.quantity && (
+                    )
+                  }}
+                />
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label>
+                  Produtos
+                  <AddButton type="button" onClick={addNewProduct}>
+                    Adicionar
+                  </AddButton>
+                </Form.Label>
+                {fields.map((field, index) => {
+                  return (
+                    <FieldsContainer key={field.id}>
+                      <Form.Field>
+                        {/* <SelectField {...register(`products.${index}.id`)}>
+                          <option value="">Selecione ...</option>
+                          {products.map((product) => {
+                            return (
+                              <option key={product.id} value={product.id}>
+                                {product.name}
+                              </option>
+                            )
+                          })}
+                        </SelectField>
                         <SpanError>
-                          {errors.products?.[index]?.quantity?.message}
-                        </SpanError>
-                      )}
-                    </Form.Field>
+                          {errors.products?.[index]?.id?.message}
+                        </SpanError> */}
+                        <Controller
+                          name="products"
+                          control={control}
+                          render={({ field }) => {
+                            const { onChange, value } = field
+                            return (
+                              <Autocomplete
+                                value={
+                                  value
+                                    ? products.find(
+                                        (product) =>
+                                          value[index].id === product.id,
+                                      ) ?? null
+                                    : null
+                                }
+                                getOptionLabel={(product) => product.name}
+                                onChange={(_, newValue) => {
+                                  onChange(newValue ? newValue.name : null)
+                                }}
+                                options={products}
+                                id="combo-box-demo"
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Produtos"
+                                    error={!!errors.products}
+                                    helperText={
+                                      errors.products?.[index]?.id?.message
+                                    }
+                                    sx={{
+                                      '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                          borderColor: '#7C7C8A',
+                                        },
+                                        '&:hover fieldset': {
+                                          borderColor: '#323238',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                          borderColor: '#015F43',
+                                        },
+                                        '& input': {
+                                          color: '#7C7C8A',
+                                        },
+                                      },
+                                      '& label.Mui-focused': {
+                                        color: '#7C7C8A',
+                                      },
+                                      '& label': {
+                                        color: '#7C7C8A',
+                                      },
+                                    }}
+                                  />
+                                )}
+                              />
+                            )
+                          }}
+                        />
+                      </Form.Field>
 
-                    <RemoveButton
-                      type="button"
-                      onClick={() => removeProduct(index)}
-                    >
-                      <Trash size={24} weight="bold" />
-                    </RemoveButton>
-                  </FieldsContainer>
-                )
-              })}
-              <Form.ErrorMessage field="products" />
-            </Form.Field>
+                      <Form.Field>
+                        <Form.Input
+                          type="number"
+                          placeholder="Quantidade"
+                          {...register(`products.${index}.quantity`)}
+                        />
+                        {errors.products?.[index]?.quantity && (
+                          <SpanError>
+                            {errors.products?.[index]?.quantity?.message}
+                          </SpanError>
+                        )}
+                      </Form.Field>
 
-            <ActionsContainer>
-              <Form.Button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                variant="secondary"
-              >
-                Cancelar
-              </Form.Button>
-              <Form.Button type="submit" variant="primary">
-                Cadastrar
-              </Form.Button>
-            </ActionsContainer>
+                      <RemoveButton
+                        type="button"
+                        onClick={() => removeProduct(index)}
+                      >
+                        <Trash size={24} weight="bold" />
+                      </RemoveButton>
+                    </FieldsContainer>
+                  )
+                })}
+                <Form.ErrorMessage field="products" />
+              </Form.Field>
+
+              <ActionsContainer>
+                <Form.Button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  variant="secondary"
+                >
+                  Cancelar
+                </Form.Button>
+                <Form.Button type="submit" variant="primary">
+                  Cadastrar
+                </Form.Button>
+              </ActionsContainer>
+            </ThemeProvider>
           </FormContainer>
         </FormProvider>
       </NewItemModal>

@@ -14,10 +14,10 @@ export const GlobalStyle = createGlobalStyle`
     font-size: 1rem;
   }
 
-  input:focus{
+  /* input:focus{
     outline: 0;
     box-shadow: 0 0 0 2px ${(props) => props.theme.color['green-500']}
-  }
+  } */
   
   body {
     background: ${(props) => props.theme.color['gray-600']};
