@@ -8,19 +8,57 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
     name: z.string({
       required_error: 'Name is required',
     }),
+    lastname: z.string({
+      required_error: 'Lastname is required',
+    }),
+    cpf: z.string({
+      required_error: 'CPF is required',
+    }),
+    phone: z.string(),
+    cep: z.string(),
+    street: z.string(),
+    number: z.number(),
+    neighborhood: z.string(),
+    complement: z.string(),
+    state: z.string(),
+    city: z.string(),
     email: z.string(),
     password: z.string(),
     // email: z.string().email(),
     // password: z.string().min(6),
   })
 
-  const { name, email, password } = registerBodySchema.parse(request.body)
+  const {
+    name,
+    lastname,
+    cpf,
+    phone,
+    cep,
+    street,
+    number,
+    neighborhood,
+    complement,
+    state,
+    city,
+    email,
+    password,
+  } = registerBodySchema.parse(request.body)
 
   try {
     const registerUseCase = makeRegisterUseCase()
 
     await registerUseCase.execute({
       name,
+      lastname,
+      cpf,
+      phone,
+      cep,
+      street,
+      number,
+      neighborhood,
+      complement,
+      state,
+      city,
       email,
       password,
     })

@@ -5,6 +5,16 @@ import { User } from '@prisma/client'
 
 interface RegisterUseCaseRequest {
   name: string
+  lastname: string
+  cpf: string
+  phone?: string
+  cep?: string
+  street?: string
+  number?: number
+  neighborhood?: string
+  complement?: string
+  state?: string
+  city?: string
   email: string
   password: string
 }
@@ -18,6 +28,16 @@ export class RegisterUseCase {
 
   async execute({
     name,
+    lastname,
+    cpf,
+    phone,
+    cep,
+    street,
+    number,
+    neighborhood,
+    complement,
+    state,
+    city,
     email,
     password,
   }: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
@@ -31,6 +51,16 @@ export class RegisterUseCase {
 
     const user = await this.usersRepository.create({
       name,
+      lastname,
+      cpf,
+      phone,
+      cep,
+      street,
+      number,
+      neighborhood,
+      complement,
+      state,
+      city,
       email,
       password_hash,
     })

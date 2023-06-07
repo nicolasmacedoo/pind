@@ -7,9 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// datasource db {
+//   provider = "sqlite"
+//   url      = "file:./dev.db"
+// }
+
 model User {
   id            String        @id @default(uuid())
   name          String
+  lastname      String
+  cpf           String
+  phone         String?
+  cep           String?
+  street        String?
+  number        Int?
+  neighborhood  String?
+  complement    String?
+  state         String?       @db.Char(2)
+  city          String?
   email         String        @unique
   password_hash String
   created_at    DateTime      @default(now())
@@ -17,29 +32,19 @@ model User {
   products      Product[]
   suppliers     Supplier[]
   transactions  Transaction[]
+  Order         Order[]
 
   @@map("users")
 }
 
-model Product {
-  id               String  @id @default(uuid())
-  name             String
-  price            Decimal @db.Money
-  quantity         Decimal @db.Decimal(6, 2)
-  unit_measurement String
-  user_id          String
-  user             User    @relation(fields: [user_id], references: [id])
-
-  @@map("products")
-}
-
 model Client {
-  id      String @id @default(uuid())
+  id      String  @id @default(uuid())
   user_id String
   name    String
-  cpf     String @unique
+  cpf     String  @unique
   phone   String
-  user    User   @relation(fields: [user_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+  Order   Order[]
 
   @@map("clients")
 }
@@ -66,4 +71,41 @@ model Transaction {
   user        User     @relation(fields: [user_id], references: [id])
 
   @@map("transactions")
+}
+
+model Product {
+  id               String      @id @default(uuid())
+  name             String
+  price            Decimal     @db.Money
+  quantity         Decimal     @db.Decimal(6, 2)
+  unit_measurement String
+  user_id          String
+  user             User        @relation(fields: [user_id], references: [id])
+  ItenOrder        ItenOrder[]
+
+  @@map("products")
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  user_id   String
+  client_id String
+  total     Decimal     @db.Money
+  date      DateTime    @default(now())
+  client    Client      @relation(fields: [client_id], references: [id])
+  user      User        @relation(fields: [user_id], references: [id])
+  ItenOrder ItenOrder[]
+
+  @@map("orders")
+}
+
+model ItenOrder {
+  product    Product @relation(fields: [product_id], references: [id])
+  order      Order   @relation(fields: [order_id], references: [id])
+  product_id String
+  order_id   String
+  quantity   Int
+
+  @@id([product_id, order_id])
+  @@map("iten_order")
 }

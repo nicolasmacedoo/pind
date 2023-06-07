@@ -1,8 +1,18 @@
-import { Prisma, Product } from '@prisma/client'
+import { ItenOrder, Prisma, Product } from '@prisma/client'
 import { ProductsRepository } from '../products-repository'
 import { prisma } from '@/lib/prisma'
 
 export class PrismaProductsRepository implements ProductsRepository {
+  async findProductInOnrder(productId: string): Promise<ItenOrder | null> {
+    const itenOrder = await prisma.itenOrder.findFirst({
+      where: {
+        product_id: productId,
+      },
+    })
+
+    return itenOrder
+  }
+
   async update(
     productId: string,
     data: Prisma.ProductUncheckedUpdateInput,
